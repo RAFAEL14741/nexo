@@ -15,13 +15,31 @@
   ============================================================ */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* ============================================================
+     COLOR SYSTEM — dark / light alternating
+     Dark sections: Hero, Marquee, Work, Contact, Footer
+     Light sections: About, Stats, Services, Process  (.lt class)
+     CTA: own accent bg (#C9F135)
+  ============================================================ */
   :root {
-    --bg:     #050508;
-    --text:   #EFEFEF;
-    --dim:    #888;
-    --muted:  #555;
-    --line:   #1a1a1a;
-    --accent: #E8FF00;
+    --bg:     #080808;
+    --text:   #F2EFE8;
+    --dim:    #888888;
+    --muted:  #666666;
+    --line:   #222222;
+    --accent: #C9F135;
+  }
+
+  /* Light-section theme override */
+  .lt {
+    --bg:     #F2EFE8;
+    --text:   #080808;
+    --dim:    #555555;
+    --muted:  #888888;
+    --line:   #E0DDD6;
+    --accent: #080808;
+    background: var(--bg);
+    color: var(--text);
   }
 
   html { color-scheme: dark; }
@@ -45,9 +63,63 @@
     inset: 0;
     z-index: 9990;
     pointer-events: none;
-    opacity: 0.04;
+    opacity: 0.035;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 300px 300px;
+  }
+
+  /* ============================================================
+     LOADER
+  ============================================================ */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: #080808;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    pointer-events: none;
+  }
+  #loader-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 80px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #F2EFE8;
+    line-height: 1;
+  }
+  #loader-bar {
+    width: 200px;
+    height: 1px;
+    background: rgba(242,239,232,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  #loader-fill {
+    position: absolute;
+    left: 0; top: 0;
+    height: 100%;
+    width: 0%;
+    background: #F2EFE8;
+  }
+
+  /* ============================================================
+     SECTION COUNTER — fixed bottom-right
+  ============================================================ */
+  #sec-counter {
+    position: fixed;
+    bottom: 32px;
+    right: 40px;
+    z-index: 9989;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(242,239,232,0.35);
+    pointer-events: none;
+    font-family: 'Inter', sans-serif;
+    mix-blend-mode: difference;
   }
 
   /* ============================================================
@@ -58,22 +130,34 @@
     top: 0; left: 0;
     width: 32px; height: 32px;
     border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.85);
+    border: 1.5px solid white;
     background: transparent;
     pointer-events: none;
     z-index: 99999;
-    /* GSAP handles transform/position */
     will-change: transform;
-  }
-  #cur.hov {
-    background: white;
     mix-blend-mode: difference;
-    border-color: white;
   }
+  #cur.hov { background: white; }
 
   /* ============================================================
-     WORD-REVEAL SYSTEM
-     .ww = outer mask (overflow:hidden), .wi = inner word (animated)
+     CHAR REVEAL — hero headlines only
+     .cw = outer mask, .ci = animated char, .char-word = word group
+  ============================================================ */
+  .cw {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    line-height: 1.05;
+  }
+  .ci {
+    display: inline-block;
+    will-change: transform;
+  }
+  .char-word { display: inline-block; }
+  .char-sp   { display: inline-block; width: 0.28em; }
+
+  /* ============================================================
+     WORD REVEAL — all other headlines
   ============================================================ */
   .ww {
     display: inline-block;
@@ -116,6 +200,16 @@
     flex-shrink: 0;
   }
 
+  /* Horizontal line draw element */
+  .section-line {
+    height: 1px;
+    background: var(--text);
+    width: 0%;
+    opacity: 0.18;
+    margin-bottom: 0;
+    will-change: width;
+  }
+
   /* ============================================================
      NAV
   ============================================================ */
@@ -127,16 +221,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: padding 0.35s ease, background 0.4s ease, backdrop-filter 0.4s ease;
     border-bottom: 1px solid transparent;
     transition: padding 0.35s, background 0.4s, border-color 0.4s;
   }
   #nav.past {
     padding: 16px 56px;
-    background: rgba(5,5,8,0.92);
+    background: rgba(8,8,8,0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-color: var(--line);
+    border-color: #222;
   }
 
   .nav-logo {
@@ -145,7 +238,7 @@
     font-weight: 800;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text);
+    color: #F2EFE8;
     text-decoration: none;
   }
 
@@ -162,33 +255,29 @@
   }
   .nav-links a {
     font-size: 13px;
-    color: var(--muted);
+    color: rgba(242,239,232,0.5);
     text-decoration: none;
     position: relative;
     padding-bottom: 4px;
     transition: color 0.2s;
   }
-  /* Dot indicator on hover */
-  .nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    background: var(--accent);
-    border-radius: 50%;
-    transition: width 0.2s ease, height 0.2s ease;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-links a:hover::after { width: 4px; height: 4px; }
+  .nav-links a:hover { color: #F2EFE8; }
 
-  /* CTA link with draw-on underline */
+  /* Underline draw — added via JS */
+  .nav-ul {
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 1px;
+    background: #F2EFE8;
+    display: block;
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
   .nav-cta {
     font-size: 13px;
     font-weight: 500;
-    color: var(--text);
+    color: #F2EFE8;
     text-decoration: none;
     position: relative;
     padding-bottom: 2px;
@@ -198,12 +287,11 @@
     position: absolute;
     bottom: 0; left: 0;
     width: 0; height: 1px;
-    background: var(--text);
+    background: #F2EFE8;
     transition: width 0.35s ease;
   }
   .nav-cta:hover::after { width: 100%; }
 
-  /* Hamburger */
   .ham {
     display: none;
     flex-direction: column;
@@ -217,16 +305,15 @@
     display: block;
     width: 22px;
     height: 1px;
-    background: var(--text);
+    background: #F2EFE8;
     transition: transform 0.3s, opacity 0.3s;
   }
 
-  /* Mobile overlay */
   #mob {
     position: fixed;
     inset: 0;
     z-index: 999;
-    background: var(--bg);
+    background: #080808;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -241,7 +328,7 @@
     font-family: 'Syne', sans-serif;
     font-size: 48px;
     font-weight: 800;
-    color: var(--text);
+    color: #F2EFE8;
     text-decoration: none;
     letter-spacing: -0.02em;
     transition: color 0.2s;
@@ -249,7 +336,7 @@
   #mob a:hover { color: var(--accent); }
 
   /* ============================================================
-     HERO
+     HERO — dark
   ============================================================ */
   #hero {
     min-height: 100vh;
@@ -259,21 +346,21 @@
     justify-content: flex-end;
     position: relative;
     overflow: hidden;
+    background: #080808;
   }
 
-  /* Perspective grid floor */
   .hero-grid {
     position: absolute;
     bottom: 0; left: -10%; right: -10%;
     height: 55%;
     background-image:
-      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
     background-size: 80px 80px;
     transform: perspective(640px) rotateX(60deg);
     transform-origin: 50% 100%;
-    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 75%);
-    mask-image: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 75%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 75%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 75%);
     pointer-events: none;
     z-index: 0;
   }
@@ -281,7 +368,7 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 220px;
-    background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+    background: linear-gradient(to bottom, #080808 0%, transparent 100%);
     pointer-events: none;
     z-index: 1;
   }
@@ -297,7 +384,8 @@
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 28px;
-    opacity: 0; /* animated in by GSAP */
+    opacity: 0;
+    will-change: transform;
   }
 
   .hero-h1 {
@@ -306,21 +394,14 @@
     font-size: clamp(64px, 10.5vw, 140px);
     line-height: 0.92;
     letter-spacing: -0.035em;
-    margin-bottom: 0;
   }
 
-  .hl {
-    display: block;
-    /* each line is block so word wraps within the line */
-  }
-
-  /* Line 2 — outline only */
+  .hl { display: block; }
   .hl-outline {
     color: transparent;
-    -webkit-text-stroke: 1.5px var(--text);
+    -webkit-text-stroke: 1.5px #F2EFE8;
   }
 
-  /* Bottom bar: sub text + scroll hint */
   .hero-bottom {
     display: flex;
     align-items: flex-end;
@@ -334,7 +415,7 @@
     line-height: 1.78;
     color: var(--dim);
     max-width: 320px;
-    opacity: 0; /* GSAP */
+    opacity: 0;
   }
 
   .hero-scroll {
@@ -344,19 +425,21 @@
     color: var(--muted);
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    opacity: 0; /* GSAP */
+    opacity: 0;
     flex-shrink: 0;
     padding-bottom: 4px;
+    will-change: transform;
   }
 
   /* ============================================================
-     MARQUEE
+     MARQUEE — dark
   ============================================================ */
   #mq {
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
     overflow: hidden;
     padding: 16px 0;
+    background: #080808;
   }
   .mq-track {
     display: flex;
@@ -373,14 +456,14 @@
     font-weight: 500;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #444;
     white-space: nowrap;
     padding: 0 32px;
   }
   .mq-dot { color: var(--accent); margin: 0 2px; }
 
   /* ============================================================
-     ABOUT / STATEMENT
+     ABOUT — light (.lt)
   ============================================================ */
   #about {
     padding: clamp(80px, 12vh, 140px) 56px;
@@ -396,7 +479,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    /* Will slide from left */
   }
 
   .about-word {
@@ -406,14 +488,13 @@
     line-height: 0.85;
     letter-spacing: -0.05em;
     color: transparent;
-    -webkit-text-stroke: 1.5px rgba(255,255,255,0.38);
+    -webkit-text-stroke: 2px rgba(8,8,8,0.22);
     user-select: none;
   }
 
   .about-right {
     padding-left: 64px;
     border-left: 1px solid var(--line);
-    /* Will slide from right */
   }
 
   .about-p1 {
@@ -435,7 +516,7 @@
   .about-p3 { margin-bottom: 0; }
 
   /* ============================================================
-     STATS
+     STATS — light (.lt)
   ============================================================ */
   #stats {
     display: grid;
@@ -446,6 +527,8 @@
   .st {
     padding: clamp(48px,8vh,88px) 48px;
     border-right: 1px solid var(--line);
+    opacity: 0;
+    transform-origin: bottom center;
   }
   .st:last-child { border-right: none; }
 
@@ -484,7 +567,7 @@
   }
 
   /* ============================================================
-     SERVICES
+     SERVICES — light (.lt)
   ============================================================ */
   #services {
     padding: clamp(80px,12vh,140px) 56px;
@@ -495,7 +578,7 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 64px;
+    margin-bottom: 56px;
   }
   .svc-head h2 {
     font-family: 'Syne', sans-serif;
@@ -514,9 +597,8 @@
     transition: background 0.3s ease;
   }
   .svc-row:last-child { border-bottom: 1px solid var(--line); }
-  .svc-row:hover { background: #0a0a0d; }
+  .svc-row:hover { background: #EBEBEB; }
 
-  /* Main row content */
   .svc-main {
     display: grid;
     grid-template-columns: 72px 1fr auto;
@@ -533,13 +615,13 @@
     font-weight: 800;
     line-height: 1;
     color: transparent;
-    -webkit-text-stroke: 1px var(--muted);
+    -webkit-text-stroke: 1px #CCCCCC;
     transition: color 0.3s ease, -webkit-text-stroke 0.3s ease;
     user-select: none;
   }
   .svc-row:hover .svc-num {
-    color: var(--accent);
-    -webkit-text-stroke: 1px var(--accent);
+    color: var(--text);
+    -webkit-text-stroke: 1px var(--text);
   }
 
   .svc-name {
@@ -557,14 +639,13 @@
     text-align: right;
   }
 
-  /* Accordion description */
   .svc-expand {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.35s ease;
     opacity: 0;
-    padding-left: 104px; /* align under name */
+    padding-left: 104px;
   }
   .svc-row:hover .svc-expand {
     max-height: 72px;
@@ -579,12 +660,13 @@
   }
 
   /* ============================================================
-     WORK — HORIZONTAL SCROLL
+     WORK — dark, PINNED HORIZONTAL SCROLL
   ============================================================ */
   #work {
     padding: clamp(80px,12vh,140px) 0 0;
     border-bottom: 1px solid var(--line);
-    overflow: hidden;
+    overflow: clip;
+    background: #080808;
   }
 
   .work-header {
@@ -624,17 +706,23 @@
     color: var(--muted);
   }
 
-  /* Horizontal scroll track */
+  /* Desktop: GSAP controls x position, no native scroll */
   .work-track {
     display: flex;
     gap: 10px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 0 56px 56px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: 0 56px 72px;
+    will-change: transform;
   }
-  .work-track::-webkit-scrollbar { display: none; }
+
+  /* Mobile: native scroll */
+  @media (max-width: 767px) {
+    .work-track {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .work-track::-webkit-scrollbar { display: none; }
+  }
 
   .wk-card {
     width: 45vw;
@@ -642,21 +730,22 @@
     height: 70vh;
     min-height: 400px;
     flex-shrink: 0;
-    scroll-snap-align: start;
     border-radius: 2px;
-    border: 1px solid var(--line);
+    border: 1px solid #2a2a2a;
     position: relative;
     overflow: hidden;
     cursor: none;
   }
 
-  /* Unique dark-but-different backgrounds */
+  @media (max-width: 767px) {
+    .wk-card { scroll-snap-align: start; }
+  }
+
   .wk-1 { background: #14131a; }
   .wk-2 { background: #131a13; }
   .wk-3 { background: #111620; }
   .wk-4 { background: #1a1318; }
 
-  /* Noise per card */
   .wk-card::before {
     content: '';
     position: absolute;
@@ -691,7 +780,6 @@
     color: var(--muted);
   }
 
-  /* Big faded outline number top right */
   .wk-big-n {
     font-family: 'Syne', sans-serif;
     font-size: clamp(72px, 10vw, 120px);
@@ -704,15 +792,46 @@
     text-align: right;
   }
 
-  .wk-bottom { }
-
   .wk-name {
     font-family: 'Syne', sans-serif;
     font-size: clamp(22px, 2.8vw, 36px);
     font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.05;
-    color: var(--text);
+    color: #F2EFE8;
+  }
+
+  /* Cursor-follow preview element per card */
+  .wk-follow {
+    position: absolute;
+    width: 100px;
+    height: 130px;
+    border-radius: 12px;
+    background: rgba(8,8,8,0.9);
+    border: 1px solid rgba(242,239,232,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    top: 0; left: 0;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+  }
+  .wk-follow-cat {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(242,239,232,0.5);
+    text-align: center;
+  }
+  .wk-follow-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: #F2EFE8;
   }
 
   /* Hover overlay — slides up from bottom */
@@ -720,7 +839,7 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     padding: 28px;
-    background: rgba(5,5,8,0.88);
+    background: rgba(8,8,8,0.9);
     transform: translateY(100%);
     transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2;
@@ -733,26 +852,27 @@
     font-weight: 800;
     letter-spacing: -0.02em;
     margin-bottom: 8px;
+    color: #F2EFE8;
   }
   .wk-ov-desc {
     font-size: 13px;
     line-height: 1.65;
-    color: var(--dim);
+    color: #888;
     margin-bottom: 16px;
   }
   .wk-ov-link {
     font-size: 12px;
-    color: var(--text);
+    color: #F2EFE8;
     text-decoration: none;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(242,239,232,0.25);
     padding-bottom: 2px;
     transition: border-color 0.2s;
   }
-  .wk-ov-link:hover { border-color: var(--text); }
+  .wk-ov-link:hover { border-color: #F2EFE8; }
 
   /* ============================================================
-     PROCESS — HOW WE WORK
+     PROCESS — light (.lt)
   ============================================================ */
   #process {
     border-bottom: 1px solid var(--line);
@@ -784,7 +904,6 @@
   }
   .p-row:last-child {
     border-bottom: 1px solid var(--line);
-    margin-bottom: 0;
   }
 
   .p-num {
@@ -794,16 +913,15 @@
     letter-spacing: -0.06em;
     line-height: 0.85;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+    -webkit-text-stroke: 1px rgba(8,8,8,0.1);
     user-select: none;
     transition: -webkit-text-stroke 0.4s ease;
+    will-change: opacity;
   }
-  /* Active (scrolled into center) */
   .p-num.active {
-    -webkit-text-stroke: 1px rgba(232,255,0,0.55);
+    -webkit-text-stroke: 1px rgba(8,8,8,0.5);
   }
 
-  .p-content {}
   .p-title {
     font-family: 'Syne', sans-serif;
     font-size: clamp(22px, 2.5vw, 34px);
@@ -811,6 +929,7 @@
     letter-spacing: -0.02em;
     margin-bottom: 14px;
     line-height: 1.1;
+    color: var(--text);
   }
   .p-desc {
     font-size: 15px;
@@ -820,10 +939,10 @@
   }
 
   /* ============================================================
-     CTA BANNER — THE SLAP
+     CTA BANNER — accent block
   ============================================================ */
   #cta {
-    background: var(--accent);
+    background: #C9F135;
     padding: clamp(80px,14vh,140px) 56px;
     text-align: center;
     position: relative;
@@ -836,21 +955,21 @@
     font-weight: 800;
     letter-spacing: -0.035em;
     line-height: 0.92;
-    color: var(--bg);
+    color: #080808;
     margin-bottom: 20px;
   }
 
   #cta p {
     font-size: 16px;
-    color: rgba(5,5,8,0.6);
+    color: rgba(8,8,8,0.6);
     margin-bottom: 48px;
     line-height: 1.65;
   }
 
   .btn-cta {
     display: inline-block;
-    background: var(--bg);
-    color: var(--accent);
+    background: #080808;
+    color: #C9F135;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 500;
@@ -862,7 +981,6 @@
   }
   .btn-cta:hover { opacity: 0.88; transform: translateY(-2px); }
 
-  /* Decorative ghost text behind CTA */
   .cta-bg-text {
     position: absolute;
     top: 50%;
@@ -874,14 +992,14 @@
     letter-spacing: -0.06em;
     line-height: 1;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(5,5,8,0.08);
+    -webkit-text-stroke: 1px rgba(8,8,8,0.07);
     white-space: nowrap;
     user-select: none;
     pointer-events: none;
   }
 
   /* ============================================================
-     CONTACT
+     CONTACT — dark
   ============================================================ */
   #contact {
     padding: clamp(80px,12vh,140px) 56px;
@@ -890,6 +1008,7 @@
     gap: 0 96px;
     border-bottom: 1px solid var(--line);
     align-items: start;
+    background: #080808;
   }
 
   .ct-left h2 {
@@ -908,7 +1027,6 @@
     max-width: 260px;
   }
 
-  /* Floating label form */
   .fg {
     position: relative;
     margin-bottom: 32px;
@@ -933,7 +1051,7 @@
   }
   .fg input:focus,
   .fg select:focus,
-  .fg textarea:focus { border-color: rgba(255,255,255,0.35); }
+  .fg textarea:focus { border-color: rgba(242,239,232,0.35); }
 
   .fg label {
     position: absolute;
@@ -959,7 +1077,7 @@
 
   .fg input::placeholder,
   .fg textarea::placeholder { color: transparent; }
-  .fg select option { background: var(--bg); color: var(--text); }
+  .fg select option { background: #080808; color: #F2EFE8; }
   .fg textarea { resize: none; min-height: 88px; }
 
   .fg-row {
@@ -993,7 +1111,6 @@
   }
   .btn-send:hover::after { width: 100%; }
 
-  /* Form success */
   #form-ok {
     display: none;
     padding: 48px 0;
@@ -1009,7 +1126,7 @@
   #form-ok p { font-size: 15px; color: var(--dim); }
 
   /* ============================================================
-     FOOTER
+     FOOTER — dark
   ============================================================ */
   footer {
     padding: 24px 56px;
@@ -1018,6 +1135,8 @@
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
+    background: #080808;
+    border-top: 1px solid #222;
   }
   footer p, footer a {
     font-size: 11px;
@@ -1026,7 +1145,7 @@
     text-decoration: none;
     transition: color 0.2s;
   }
-  footer a:hover { color: var(--text); }
+  footer a:hover { color: #F2EFE8; }
   .ft-right { display: flex; gap: 20px; }
 
   /* ============================================================
@@ -1034,7 +1153,7 @@
   ============================================================ */
   @media (max-width: 1024px) {
     #about { grid-template-columns: 1fr; }
-    .about-right { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 48px; margin-top: 0; }
+    .about-right { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 48px; }
     #contact { grid-template-columns: 1fr; gap: 52px; }
     .p-row { grid-template-columns: 1fr; gap: 0; }
     .p-num { font-size: 80px; }
@@ -1068,8 +1187,9 @@
     .work-header { padding: 0 24px; }
     .work-track { padding: 0 24px 40px; }
     .wk-card { width: 82vw; min-width: 280px; height: 60vh; }
+    .wk-follow { display: none; }
 
-    #process { }
+    #process {}
     .process-head { padding: clamp(64px,10vh,100px) 24px 0; }
     .process-list { padding: 40px 24px 0; }
 
@@ -1080,6 +1200,8 @@
     .fg-row { grid-template-columns: 1fr; gap: 0; }
 
     footer { padding: 20px 24px; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+    #sec-counter { display: none; }
   }
 
   @media (max-width: 480px) {
@@ -1088,6 +1210,15 @@
   </style>
 </head>
 <body>
+
+<!-- LOADER -->
+<div id="loader">
+  <span id="loader-logo">NEXO</span>
+  <div id="loader-bar"><div id="loader-fill"></div></div>
+</div>
+
+<!-- SECTION COUNTER -->
+<div id="sec-counter">01 / 07</div>
 
 <!-- CURSOR -->
 <div id="cur"></div>
@@ -1122,7 +1253,7 @@
 </div>
 
 <!-- ============================================================
-     HERO
+     HERO — dark
 ============================================================ -->
 <section id="hero">
   <div class="hero-grid" aria-hidden="true"></div>
@@ -1148,7 +1279,7 @@
 </section>
 
 <!-- ============================================================
-     MARQUEE
+     MARQUEE — dark
 ============================================================ -->
 <div id="mq" aria-hidden="true">
   <div class="mq-track">
@@ -1158,9 +1289,9 @@
 </div>
 
 <!-- ============================================================
-     ABOUT
+     ABOUT — light
 ============================================================ -->
-<section id="about">
+<section id="about" class="lt">
   <div class="about-left">
     <span class="about-word" aria-hidden="true">LOCAL</span>
   </div>
@@ -1181,9 +1312,9 @@
 </section>
 
 <!-- ============================================================
-     STATS
+     STATS — light
 ============================================================ -->
-<div id="stats">
+<div id="stats" class="lt">
   <div class="st">
     <div class="st-row">
       <span class="st-n" data-target="14">14</span>
@@ -1215,9 +1346,11 @@
 </div>
 
 <!-- ============================================================
-     SERVICES
+     SERVICES — light
 ============================================================ -->
-<section id="services">
+<section id="services" class="lt">
+  <div class="section-line" id="svc-line"></div>
+
   <div class="svc-head">
     <div class="s-label">What We Build</div>
     <h2 id="svc-h2">Three ways to start.</h2>
@@ -1262,7 +1395,7 @@
 </section>
 
 <!-- ============================================================
-     WORK
+     WORK — dark, pinned horizontal scroll
 ============================================================ -->
 <section id="work">
   <div class="work-header">
@@ -1272,7 +1405,7 @@
     </div>
     <div class="work-counter-wrap">
       <span id="work-counter">01 / 04</span>
-      <span class="work-drag-hint">→ drag to explore</span>
+      <span class="work-drag-hint">↓ scroll to explore</span>
     </div>
   </div>
 
@@ -1293,6 +1426,10 @@
         <p class="wk-ov-desc">Full Uber Eats-style menu, dark luxury aesthetic, online ordering built from scratch.</p>
         <a href="#" class="wk-ov-link">View live demo →</a>
       </div>
+      <div class="wk-follow" aria-hidden="true">
+        <span class="wk-follow-cat">Restaurant</span>
+        <span class="wk-follow-cta">View →</span>
+      </div>
     </div>
 
     <div class="wk-card wk-2">
@@ -1309,6 +1446,10 @@
         <div class="wk-ov-title">Lorena's Cleaning LLC</div>
         <p class="wk-ov-desc">Booking system, 4-team management, Stripe billing, and a client portal — fully automated.</p>
         <a href="#" class="wk-ov-link">View live demo →</a>
+      </div>
+      <div class="wk-follow" aria-hidden="true">
+        <span class="wk-follow-cat">Cleaning</span>
+        <span class="wk-follow-cta">View →</span>
       </div>
     </div>
 
@@ -1327,6 +1468,10 @@
         <p class="wk-ov-desc">WhatsApp ordering, weekly specials calendar, and admin portal built around a real POS system.</p>
         <a href="#" class="wk-ov-link">View live demo →</a>
       </div>
+      <div class="wk-follow" aria-hidden="true">
+        <span class="wk-follow-cat">Retail</span>
+        <span class="wk-follow-cta">View →</span>
+      </div>
     </div>
 
     <div class="wk-card wk-4">
@@ -1344,16 +1489,21 @@
         <p class="wk-ov-desc">Project showcase, quote request system, and a gallery that lets the work speak without words.</p>
         <a href="#" class="wk-ov-link">View live demo →</a>
       </div>
+      <div class="wk-follow" aria-hidden="true">
+        <span class="wk-follow-cat">Construction</span>
+        <span class="wk-follow-cta">View →</span>
+      </div>
     </div>
 
   </div>
 </section>
 
 <!-- ============================================================
-     PROCESS
+     PROCESS — light
 ============================================================ -->
-<section id="process">
+<section id="process" class="lt">
   <div class="process-head">
+    <div class="section-line" id="proc-line"></div>
     <div class="s-label">How We Work</div>
     <h2 id="process-h2">Idea to live<br>in 7 days.</h2>
   </div>
@@ -1398,7 +1548,7 @@
 </section>
 
 <!-- ============================================================
-     CONTACT
+     CONTACT — dark
 ============================================================ -->
 <section id="contact">
   <div class="ct-left">
@@ -1459,7 +1609,7 @@
 </section>
 
 <!-- ============================================================
-     FOOTER
+     FOOTER — dark
 ============================================================ -->
 <footer>
   <p>NEXO © 2025</p>
@@ -1471,7 +1621,7 @@
 </footer>
 
 <!-- ============================================================
-     SCRIPTS — Lenis must init first
+     SCRIPTS
 ============================================================ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -1479,18 +1629,16 @@
 
 <script>
 /* ------------------------------------------------------------------
-   1. LENIS + GSAP INTEGRATION — must be first
+   1. LENIS + GSAP INTEGRATION
 ------------------------------------------------------------------ */
 const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
-
 gsap.ticker.add((time) => { lenis.raf(time * 1000); });
 gsap.ticker.lagSmoothing(0);
-
 gsap.registerPlugin(ScrollTrigger);
 lenis.on('scroll', ScrollTrigger.update);
 
 /* ------------------------------------------------------------------
-   2. CURSOR — 32px circle, lerp lag, mix-blend-mode on hover
+   2. CURSOR
 ------------------------------------------------------------------ */
 const cur = document.getElementById('cur');
 let tx = -100, ty = -100, cx = -100, cy = -100;
@@ -1500,7 +1648,7 @@ document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; })
 gsap.ticker.add(() => {
   cx += (tx - cx) * 0.12;
   cy += (ty - cy) * 0.12;
-  gsap.set(cur, { x: cx - 16, y: cy - 16 }); /* -16 = half of 32px */
+  gsap.set(cur, { x: cx - 16, y: cy - 16 });
 });
 
 const hovers = 'a, button, input, select, textarea, .svc-row, .wk-card, .btn-cta, .btn-send';
@@ -1521,6 +1669,26 @@ document.querySelectorAll(hovers).forEach(el => {
 const nav = document.getElementById('nav');
 lenis.on('scroll', ({ scroll }) => {
   nav.classList.toggle('past', scroll > 80);
+});
+
+/* ------------------------------------------------------------------
+   3B. NAV LINK UNDERLINE DRAW (F)
+------------------------------------------------------------------ */
+document.querySelectorAll('.nav-links a').forEach(link => {
+  const ul = document.createElement('span');
+  ul.className = 'nav-ul';
+  link.appendChild(ul);
+
+  link.addEventListener('mouseenter', () => {
+    gsap.killTweensOf(ul);
+    gsap.set(ul, { transformOrigin: 'left center' });
+    gsap.fromTo(ul, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: 'power2.out' });
+  });
+  link.addEventListener('mouseleave', () => {
+    gsap.killTweensOf(ul);
+    gsap.set(ul, { transformOrigin: 'right center' });
+    gsap.to(ul, { scaleX: 0, duration: 0.25, ease: 'power2.in' });
+  });
 });
 
 /* ------------------------------------------------------------------
@@ -1547,9 +1715,30 @@ function closeMob() {
 }
 
 /* ------------------------------------------------------------------
-   5. WORD REVEAL — the signature animation
-   Wraps each word in .ww (overflow:hidden mask) + .wi (animated)
-   Then animates: translateY(105%) rotate(8deg) → 0, 0
+   5. CHAR REVEAL — hero headlines (A)
+   buildCharReveal: splits el text into character spans
+   Each char: .cw (overflow:hidden mask) + .ci (animated)
+   Words separated by .char-sp spacers
+------------------------------------------------------------------ */
+function buildCharReveal(el) {
+  const raw = el.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+  const tmp = document.createElement('span');
+  tmp.innerHTML = raw;
+  const words = tmp.textContent.trim().split(/\s+/);
+
+  const html = words.map((word, wi) => {
+    const chars = word.split('').map(ch =>
+      `<span class="cw"><span class="ci">${ch}</span></span>`
+    ).join('');
+    return `<span class="char-word">${chars}</span>${wi < words.length - 1 ? '<span class="char-sp"> </span>' : ''}`;
+  }).join('');
+
+  el.innerHTML = html;
+  return el.querySelectorAll('.ci');
+}
+
+/* ------------------------------------------------------------------
+   6. WORD REVEAL — all other headings
 ------------------------------------------------------------------ */
 function buildReveal(el) {
   const raw = el.innerHTML.replace(/<br\s*\/?>/gi, ' ');
@@ -1567,39 +1756,94 @@ function revealWords(words, opts = {}) {
   gsap.fromTo(words,
     { y: '105%', rotate: 8 },
     {
-      y: '0%',
-      rotate: 0,
+      y: '0%', rotate: 0,
       duration: opts.duration || (isMobile ? 0.7 : 0.9),
       ease: 'power3.out',
       stagger: opts.stagger || 0.08,
       delay: opts.delay || 0,
-      ...opts.extra,
+      ...(opts.extra || {})
     }
   );
 }
 
 /* ------------------------------------------------------------------
-   6. HERO ANIMATIONS — run immediately on load
+   7. LOADER + HERO CHAR ANIMATIONS
+      Loader plays once (sessionStorage), then fires hero chars
 ------------------------------------------------------------------ */
-/* Split all three headline lines */
-const l1words = buildReveal(document.getElementById('hl1'));
-const l2words = buildReveal(document.getElementById('hl2'));
-const l3words = buildReveal(document.getElementById('hl3'));
+function fireHeroAnimations() {
+  /* Character reveal for hero headlines */
+  const c1 = buildCharReveal(document.getElementById('hl1'));
+  const c2 = buildCharReveal(document.getElementById('hl2'));
+  const c3 = buildCharReveal(document.getElementById('hl3'));
 
-/* Stagger between lines: 0.15s */
-revealWords(l1words, { delay: 0.3 });
-revealWords(l2words, { delay: 0.3 + 0.15 });
-revealWords(l3words, { delay: 0.3 + 0.30 });
+  /* All chars of all 3 lines, staggered by line */
+  gsap.fromTo(c1, { y: '110%' }, { y: '0%', duration: 1, ease: 'power4.out', stagger: 0.03, delay: 0 });
+  gsap.fromTo(c2, { y: '110%' }, { y: '0%', duration: 1, ease: 'power4.out', stagger: 0.03, delay: c1.length * 0.03 + 0.05 });
+  gsap.fromTo(c3, { y: '110%' }, { y: '0%', duration: 1, ease: 'power4.out', stagger: 0.03, delay: (c1.length + c2.length) * 0.03 + 0.1 });
 
-/* Supporting elements fade after headlines */
-gsap.to('.hero-eyebrow', { opacity: 1, y: 0, duration: 0.7, delay: 0.2, ease: 'power2.out',
-  from: { opacity: 0, y: 12 } });
-gsap.fromTo('.hero-eyebrow', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.2 });
-gsap.fromTo('.hero-sub',    { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, delay: 1.05 });
-gsap.fromTo('.hero-scroll', { opacity: 0 },         { opacity: 1, duration: 0.8, delay: 1.2 });
+  gsap.fromTo('.hero-eyebrow', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.15 });
+  gsap.fromTo('.hero-sub',     { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.9 });
+  gsap.fromTo('.hero-scroll',  { opacity: 0 },         { opacity: 1, duration: 0.8, delay: 1.1 });
+}
+
+const loaderEl = document.getElementById('loader');
+
+if (!sessionStorage.getItem('nexo_loaded')) {
+  sessionStorage.setItem('nexo_loaded', '1');
+  const loaderTl = gsap.timeline();
+  loaderTl
+    .to('#loader-fill', { width: '100%', duration: 1.2, ease: 'power2.inOut' })
+    .to('#loader',      { yPercent: -100, duration: 0.65, ease: 'power3.in', delay: 0.18,
+        onComplete() { loaderEl.remove(); }
+      })
+    .add(() => fireHeroAnimations(), '-=0.1');
+} else {
+  loaderEl.remove();
+  fireHeroAnimations();
+}
 
 /* ------------------------------------------------------------------
-   7. ABOUT — slide from sides simultaneously
+   8. HERO PARALLAX — eyebrow + scroll hint (G)
+------------------------------------------------------------------ */
+gsap.to('.hero-eyebrow', {
+  yPercent: -60,
+  ease: 'none',
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+gsap.to('.hero-scroll', {
+  yPercent: 40,
+  ease: 'none',
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+/* ------------------------------------------------------------------
+   9. SECTION COUNTER — fixed, flips on section enter (H)
+------------------------------------------------------------------ */
+const secCounterEl = document.getElementById('sec-counter');
+const secIds = ['hero','about','services','work','process','cta','contact'];
+const secTotal = secIds.length;
+
+function flipCounter(text) {
+  gsap.to(secCounterEl, {
+    opacity: 0, y: -6, duration: 0.12,
+    onComplete() {
+      secCounterEl.textContent = text;
+      gsap.fromTo(secCounterEl, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.18 });
+    }
+  });
+}
+
+secIds.forEach((id, i) => {
+  ScrollTrigger.create({
+    trigger: `#${id}`,
+    start: 'top 55%',
+    onEnter:     () => flipCounter(`${String(i+1).padStart(2,'0')} / 0${secTotal}`),
+    onLeaveBack: () => i > 0 && flipCounter(`${String(i).padStart(2,'0')} / 0${secTotal}`),
+  });
+});
+
+/* ------------------------------------------------------------------
+   10. ABOUT — slide from sides
 ------------------------------------------------------------------ */
 ScrollTrigger.create({
   trigger: '#about',
@@ -1608,22 +1852,38 @@ ScrollTrigger.create({
   onEnter() {
     gsap.fromTo('.about-left',  { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' });
     gsap.fromTo('.about-right', { x:  60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' });
-    gsap.fromTo('.about-p1', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.3, ease: 'power2.out' });
-    gsap.fromTo('.about-p2', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.45, ease: 'power2.out' });
-    gsap.fromTo('.about-p3', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.55, ease: 'power2.out' });
+    gsap.fromTo('.about-p1', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.3 });
+    gsap.fromTo('.about-p2', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.45 });
+    gsap.fromTo('.about-p3', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, delay: 0.55 });
   }
 });
 
 /* ------------------------------------------------------------------
-   8. STATS — count-up on scroll enter
+   11. STATS — scrub-based scale + fade (D)
 ------------------------------------------------------------------ */
+document.querySelectorAll('.st').forEach((st, i) => {
+  gsap.fromTo(st,
+    { opacity: 0, scale: 0.88 },
+    {
+      opacity: 1, scale: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: st,
+        start: 'top 92%',
+        end: 'top 52%',
+        scrub: 0.8,
+      }
+    }
+  );
+});
+
+/* Count-up — fires once element is in view */
 document.querySelectorAll('.st-n').forEach(el => {
   const target = parseInt(el.dataset.target, 10);
   let done = false;
-
   ScrollTrigger.create({
     trigger: el,
-    start: 'top 85%',
+    start: 'top 80%',
     once: true,
     onEnter() {
       if (done || target === 0) return;
@@ -1638,8 +1898,17 @@ document.querySelectorAll('.st-n').forEach(el => {
 });
 
 /* ------------------------------------------------------------------
-   9. SERVICES — label + headline reveal
+   12. SERVICES — line draw + headline reveal (E, 9)
 ------------------------------------------------------------------ */
+ScrollTrigger.create({
+  trigger: '#svc-line',
+  start: 'top 88%',
+  once: true,
+  onEnter() {
+    gsap.to('#svc-line', { width: '100%', duration: 1.2, ease: 'power2.inOut' });
+  }
+});
+
 ScrollTrigger.create({
   trigger: '#services',
   start: 'top 80%',
@@ -1655,36 +1924,96 @@ ScrollTrigger.create({
 });
 
 /* ------------------------------------------------------------------
-   10. WORK — headline reveal + card counter
+   13. WORK — pinned horizontal scroll (B) + cursor follow (C)
+------------------------------------------------------------------ */
+const wkTrack   = document.getElementById('work-track');
+const wkCards   = Array.from(wkTrack.querySelectorAll('.wk-card'));
+const wkCounter = document.getElementById('work-counter');
+const wkTotal   = String(wkCards.length).padStart(2, '0');
+
+if (window.innerWidth >= 768) {
+  /* Desktop: ScrollTrigger pin drives x translation */
+  ScrollTrigger.create({
+    trigger: '#work',
+    start: 'top top',
+    end: () => '+=' + (wkTrack.scrollWidth - window.innerWidth),
+    scrub: 1,
+    pin: true,
+    anticipatePin: 1,
+    onUpdate(self) {
+      const travel = wkTrack.scrollWidth - window.innerWidth;
+      gsap.set(wkTrack, { x: -(self.progress * travel) });
+      const idx = Math.min(
+        Math.round(self.progress * (wkCards.length - 1)),
+        wkCards.length - 1
+      );
+      const newText = `${String(idx + 1).padStart(2,'0')} / ${wkTotal}`;
+      if (wkCounter.textContent !== newText) wkCounter.textContent = newText;
+    }
+  });
+
+  /* Work headline reveal fires just before pin locks */
+  ScrollTrigger.create({
+    trigger: '#work',
+    start: 'top 85%',
+    once: true,
+    onEnter() {
+      const h2words = buildReveal(document.getElementById('work-h2'));
+      revealWords(h2words, { delay: 0.1 });
+    }
+  });
+
+} else {
+  /* Mobile: native horizontal scroll */
+  wkTrack.addEventListener('scroll', () => {
+    const idx = Math.round(wkTrack.scrollLeft / (wkCards[0].offsetWidth + 10));
+    wkCounter.textContent = `${String(Math.min(idx + 1, wkCards.length)).padStart(2,'0')} / ${wkTotal}`;
+  }, { passive: true });
+
+  ScrollTrigger.create({
+    trigger: '#work',
+    start: 'top 80%',
+    once: true,
+    onEnter() {
+      const h2words = buildReveal(document.getElementById('work-h2'));
+      revealWords(h2words, { delay: 0.1 });
+    }
+  });
+}
+
+/* Cursor-follow preview per card (C) */
+wkCards.forEach(card => {
+  const follow = card.querySelector('.wk-follow');
+  if (!follow) return;
+
+  const qx = gsap.quickTo(follow, 'x', { duration: 0.15, ease: 'none' });
+  const qy = gsap.quickTo(follow, 'y', { duration: 0.15, ease: 'none' });
+
+  card.addEventListener('mouseenter', () => {
+    gsap.to(follow, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+  });
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    qx(e.clientX - rect.left);
+    qy(e.clientY - rect.top);
+  });
+  card.addEventListener('mouseleave', () => {
+    gsap.to(follow, { opacity: 0, duration: 0.2 });
+  });
+});
+
+/* ------------------------------------------------------------------
+   14. PROCESS — line draw + headline + scrub numbers (E, 11)
 ------------------------------------------------------------------ */
 ScrollTrigger.create({
-  trigger: '#work',
-  start: 'top 80%',
+  trigger: '#proc-line',
+  start: 'top 88%',
   once: true,
   onEnter() {
-    const h2words = buildReveal(document.getElementById('work-h2'));
-    revealWords(h2words, { delay: 0.1 });
-    gsap.fromTo('.wk-card',
-      { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', stagger: 0.09, delay: 0.3 }
-    );
+    gsap.to('#proc-line', { width: '100%', duration: 1.2, ease: 'power2.inOut' });
   }
 });
 
-/* Work card counter — updates as you drag */
-const wkTrack   = document.getElementById('work-track');
-const wkCounter = document.getElementById('work-counter');
-const wkCards   = wkTrack.querySelectorAll('.wk-card');
-const wkTotal   = String(wkCards.length).padStart(2, '0');
-
-wkTrack.addEventListener('scroll', () => {
-  const idx = Math.round(wkTrack.scrollLeft / (wkCards[0].offsetWidth + 10));
-  wkCounter.textContent = `${String(Math.min(idx + 1, wkCards.length)).padStart(2,'0')} / ${wkTotal}`;
-}, { passive: true });
-
-/* ------------------------------------------------------------------
-   11. PROCESS — headline + scrub-based number activation
------------------------------------------------------------------- */
 ScrollTrigger.create({
   trigger: '#process',
   start: 'top 80%',
@@ -1695,17 +2024,15 @@ ScrollTrigger.create({
   }
 });
 
-/* Scrub: number outline brightens + accent tint as step hits center */
-document.querySelectorAll('.p-row').forEach((row, i) => {
-  const num = row.querySelector('.p-num');
+document.querySelectorAll('.p-row').forEach(row => {
+  const num   = row.querySelector('.p-num');
   const title = row.querySelector('.p-title');
-  const desc = row.querySelector('.p-desc');
+  const desc  = row.querySelector('.p-desc');
 
-  /* Scrub opacity on the number */
   gsap.fromTo(num,
-    { opacity: 0.12 },
+    { opacity: 0.1 },
     {
-      opacity: 0.6,
+      opacity: 0.55,
       ease: 'none',
       scrollTrigger: {
         trigger: row,
@@ -1718,7 +2045,6 @@ document.querySelectorAll('.p-row').forEach((row, i) => {
     }
   );
 
-  /* Title + desc entrance */
   ScrollTrigger.create({
     trigger: row,
     start: 'top 75%',
@@ -1732,7 +2058,7 @@ document.querySelectorAll('.p-row').forEach((row, i) => {
 });
 
 /* ------------------------------------------------------------------
-   12. CTA BANNER — word reveal + scale entrance
+   15. CTA BANNER
 ------------------------------------------------------------------ */
 ScrollTrigger.create({
   trigger: '#cta',
@@ -1740,8 +2066,7 @@ ScrollTrigger.create({
   once: true,
   onEnter() {
     const h2words = buildReveal(document.getElementById('cta-h2'));
-    /* Override color inside the yellow section */
-    document.querySelectorAll('#cta .ww').forEach(ww => { ww.style.color = 'var(--bg)'; });
+    document.querySelectorAll('#cta .ww').forEach(ww => { ww.style.color = '#080808'; });
     revealWords(h2words, { delay: 0.1 });
     gsap.fromTo('#cta p',       { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.5 });
     gsap.fromTo('.btn-cta',     { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.5, delay: 0.65 });
@@ -1750,7 +2075,7 @@ ScrollTrigger.create({
 });
 
 /* ------------------------------------------------------------------
-   13. CONTACT — word reveal
+   16. CONTACT
 ------------------------------------------------------------------ */
 ScrollTrigger.create({
   trigger: '#contact',
@@ -1765,7 +2090,7 @@ ScrollTrigger.create({
 });
 
 /* ------------------------------------------------------------------
-   14. GENERAL S-LABELS entrance
+   17. S-LABELS — general entrance
 ------------------------------------------------------------------ */
 document.querySelectorAll('.s-label').forEach(el => {
   ScrollTrigger.create({
@@ -1779,7 +2104,7 @@ document.querySelectorAll('.s-label').forEach(el => {
 });
 
 /* ------------------------------------------------------------------
-   15. CONTACT FORM
+   18. CONTACT FORM
 ------------------------------------------------------------------ */
 document.getElementById('cform').addEventListener('submit', e => {
   e.preventDefault();
