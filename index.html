@@ -1207,6 +1207,216 @@
   @media (max-width: 480px) {
     .hero-h1 { font-size: clamp(48px, 13vw, 72px); }
   }
+
+  /* ============================================================
+     TRANSITION OVERLAY
+  ============================================================ */
+  #transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: #080808;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transform: translateY(100%);
+    will-change: transform;
+  }
+  #tr-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: #F2EFE8;
+    opacity: 0;
+  }
+
+  /* ============================================================
+     CASE STUDY PAGE
+  ============================================================ */
+  #case-study-page {
+    position: fixed;
+    inset: 0;
+    z-index: 9989;
+    overflow-y: auto;
+    pointer-events: none;
+    opacity: 0;
+    background: #080808;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cs-back {
+    position: sticky;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(242,239,232,0.5);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+    border: none;
+    cursor: none;
+    padding: 22px 56px;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.2s;
+    z-index: 10;
+    width: 100%;
+    text-align: left;
+  }
+  .cs-back:hover { color: #F2EFE8; }
+  .cs-back::before { content: '← '; }
+  .cs-hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 56px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cs-tag-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .cs-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(56px, 9vw, 120px);
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+    margin-bottom: 20px;
+    color: #F2EFE8;
+  }
+  .cs-subtitle {
+    font-size: 17px;
+    color: rgba(242,239,232,0.45);
+    max-width: 400px;
+    line-height: 1.55;
+  }
+  .cs-body {
+    padding: 0 56px 120px;
+  }
+  .cs-section {
+    border-top: 1px solid rgba(242,239,232,0.08);
+    padding: 64px 0;
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 0 80px;
+    align-items: start;
+  }
+  .cs-section:last-of-type {
+    border-bottom: 1px solid rgba(242,239,232,0.08);
+  }
+  .cs-sec-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 0.85;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(242,239,232,0.1);
+    user-select: none;
+  }
+  .cs-sec-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .cs-sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px, 2.8vw, 38px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+    color: #F2EFE8;
+    line-height: 1.05;
+  }
+  .cs-sec-text {
+    font-size: 16px;
+    line-height: 1.85;
+    color: rgba(242,239,232,0.52);
+    max-width: 540px;
+  }
+  .cs-tags-row {
+    padding: 52px 0 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .cs-pill {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid rgba(242,239,232,0.18);
+    padding: 7px 16px;
+    border-radius: 100px;
+    color: rgba(242,239,232,0.4);
+  }
+  @media (max-width: 768px) {
+    .cs-back { padding: 18px 24px; }
+    .cs-hero { padding: 0 24px 64px; }
+    .cs-body { padding: 0 24px 80px; }
+    .cs-section { grid-template-columns: 1fr; gap: 0; }
+    .cs-sec-num { font-size: 48px; margin-bottom: 16px; }
+  }
+
+  /* ============================================================
+     CURSOR — UPGRADED STATES
+  ============================================================ */
+  #cur-txt {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+  }
+  #cur.cur-view,
+  #cur.cur-go {
+    mix-blend-mode: normal !important;
+    background: rgba(12,12,12,0.9) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+  #cur.cur-dot {
+    mix-blend-mode: normal !important;
+    background: rgba(242,239,232,0.92) !important;
+    border-color: transparent !important;
+  }
+
+  /* ============================================================
+     CLICK RIPPLE
+  ============================================================ */
+  .ripple-el {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99988;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    margin-left: -20px;
+    margin-top: -20px;
+    will-change: transform, opacity;
+  }
+
+  /* ============================================================
+     WK-FOLLOW — replaced by cursor text
+  ============================================================ */
+  .wk-follow { display: none !important; }
   </style>
 </head>
 <body>
@@ -1221,7 +1431,7 @@
 <div id="sec-counter">01 / 07</div>
 
 <!-- CURSOR -->
-<div id="cur"></div>
+<div id="cur"><span id="cur-txt"></span></div>
 
 <!-- ============================================================
      NAV
@@ -1620,6 +1830,14 @@
   </div>
 </footer>
 
+<!-- TRANSITION OVERLAY -->
+<div id="transition-overlay" aria-hidden="true">
+  <span id="tr-logo">NEXO</span>
+</div>
+
+<!-- CASE STUDY PAGE (JS-rendered) -->
+<div id="case-study-page" aria-hidden="true"></div>
+
 <!-- ============================================================
      SCRIPTS
 ============================================================ -->
@@ -1651,7 +1869,7 @@ gsap.ticker.add(() => {
   gsap.set(cur, { x: cx - 16, y: cy - 16 });
 });
 
-const hovers = 'a, button, input, select, textarea, .svc-row, .wk-card, .btn-cta, .btn-send';
+const hovers = 'button, input, select, textarea, .svc-row, .btn-send, footer a';
 document.querySelectorAll(hovers).forEach(el => {
   el.addEventListener('mouseenter', () => {
     cur.classList.add('hov');
@@ -2117,6 +2335,362 @@ document.getElementById('cform').addEventListener('submit', e => {
       gsap.fromTo(ok, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5 });
     }
   });
+});
+
+/* ------------------------------------------------------------------
+   19. CURSOR UPGRADE — VIEW / DOT / GO modes
+------------------------------------------------------------------ */
+const curTxt = document.getElementById('cur-txt');
+
+function setCursorState(mode, label) {
+  cur.classList.remove('cur-view', 'cur-go', 'cur-dot', 'hov');
+  gsap.killTweensOf('#cur-txt');
+  if (mode === 'view') {
+    cur.classList.add('cur-view');
+    curTxt.textContent = label || 'VIEW';
+    gsap.to(cur,      { scale: 2.5,   duration: 0.3,  ease: 'power2.out' });
+    gsap.to('#cur-txt', { opacity: 1, duration: 0.15 });
+  } else if (mode === 'go') {
+    cur.classList.add('cur-go');
+    curTxt.textContent = label || 'GO';
+    gsap.to(cur,      { scale: 1.875, duration: 0.3,  ease: 'power2.out' });
+    gsap.to('#cur-txt', { opacity: 1, duration: 0.15 });
+  } else if (mode === 'dot') {
+    cur.classList.add('cur-dot');
+    gsap.to(cur,      { scale: 0.25,  duration: 0.22, ease: 'power2.out' });
+    gsap.to('#cur-txt', { opacity: 0, duration: 0.1 });
+  } else {
+    gsap.to(cur,      { scale: 1,     duration: 0.3,  ease: 'power2.out' });
+    gsap.to('#cur-txt', { opacity: 0, duration: 0.12 });
+  }
+}
+
+/* Work cards → VIEW */
+wkCards.forEach(card => {
+  card.addEventListener('mouseenter', () => setCursorState('view', 'VIEW'));
+  card.addEventListener('mouseleave', () => setCursorState('reset'));
+});
+
+/* Nav links + logo → dot */
+document.querySelectorAll('.nav-links a, .nav-cta, .nav-logo').forEach(el => {
+  el.addEventListener('mouseenter', () => setCursorState('dot'));
+  el.addEventListener('mouseleave', () => setCursorState('reset'));
+});
+
+/* CTA buttons → GO */
+document.querySelectorAll('.btn-cta').forEach(el => {
+  el.addEventListener('mouseenter', () => setCursorState('go', 'GO'));
+  el.addEventListener('mouseleave', () => setCursorState('reset'));
+});
+
+/* ------------------------------------------------------------------
+   20. CLICK RIPPLE — tactile circle on every click
+------------------------------------------------------------------ */
+document.addEventListener('click', e => {
+  const r = document.createElement('div');
+  r.className = 'ripple-el';
+  r.style.left = e.clientX + 'px';
+  r.style.top  = e.clientY + 'px';
+  document.body.appendChild(r);
+  gsap.fromTo(r,
+    { scale: 0, opacity: 1 },
+    { scale: 4, opacity: 0, duration: 0.6, ease: 'power2.out',
+      onComplete() { r.remove(); }
+    }
+  );
+});
+
+/* ------------------------------------------------------------------
+   21. BODY BACKGROUND BREATHING — scrub dark↔light at section edges
+------------------------------------------------------------------ */
+/* Hero → About: dark to cream */
+gsap.fromTo('body',
+  { backgroundColor: '#080808' },
+  { backgroundColor: '#F2EFE8', ease: 'none',
+    scrollTrigger: { trigger: '#about', start: 'top bottom', end: 'top 60%', scrub: 1 } }
+);
+/* Services → Work: cream to dark */
+gsap.fromTo('body',
+  { backgroundColor: '#F2EFE8' },
+  { backgroundColor: '#080808', ease: 'none',
+    scrollTrigger: { trigger: '#work', start: 'top bottom', end: 'top 60%', scrub: 1 } }
+);
+/* Work → Process: dark to cream */
+gsap.fromTo('body',
+  { backgroundColor: '#080808' },
+  { backgroundColor: '#F2EFE8', ease: 'none',
+    scrollTrigger: { trigger: '#process', start: 'top bottom', end: 'top 60%', scrub: 1 } }
+);
+/* Process → CTA: cream to dark */
+gsap.fromTo('body',
+  { backgroundColor: '#F2EFE8' },
+  { backgroundColor: '#080808', ease: 'none',
+    scrollTrigger: { trigger: '#cta', start: 'top bottom', end: 'top 60%', scrub: 1 } }
+);
+
+/* ------------------------------------------------------------------
+   22. PAGE TRANSITION OVERLAY SYSTEM
+------------------------------------------------------------------ */
+let isTransitioning = false;
+const trOverlay = document.getElementById('transition-overlay');
+
+function transitionLeave() {
+  return new Promise(resolve => {
+    isTransitioning = true;
+    trOverlay.style.pointerEvents = 'all';
+    gsap.set(trOverlay,  { yPercent: 100 });
+    gsap.set('#tr-logo', { opacity: 0 });
+    const tl = gsap.timeline({ onComplete: resolve });
+    tl.to(trOverlay,  { yPercent: 0, duration: 0.6, ease: 'power3.inOut' });
+    tl.to('#tr-logo', { opacity: 1,  duration: 0.2 }, '-=0.28');
+  });
+}
+
+function transitionEnter(midFn) {
+  return new Promise(resolve => {
+    if (midFn) midFn();
+    const tl = gsap.timeline({
+      onComplete() {
+        gsap.set(trOverlay,  { yPercent: 100 });
+        gsap.set('#tr-logo', { opacity: 0 });
+        trOverlay.style.pointerEvents = 'none';
+        isTransitioning = false;
+        resolve();
+      }
+    });
+    tl.to('#tr-logo', { opacity: 0, duration: 0.15 });
+    tl.to(trOverlay,  { yPercent: -100, duration: 0.6, ease: 'power3.inOut' }, '-=0.05');
+  });
+}
+
+/* Nav link intercept — "breathe" between sections */
+document.querySelectorAll('.nav-links a, .nav-cta, #mob a, .hero-logo').forEach(a => {
+  a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (!href || !href.startsWith('#') || href === '#') return;
+    const target = document.getElementById(href.slice(1));
+    if (!target || isTransitioning || csOpen) return;
+    e.preventDefault();
+
+    transitionLeave().then(() => {
+      /* Overlay covers — safe to jump */
+      const top = target.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo(0, top);
+      ScrollTrigger.refresh();
+      transitionEnter();
+    });
+  });
+});
+
+/* ------------------------------------------------------------------
+   23. CASE STUDY PAGES — data + render + morph open/close
+------------------------------------------------------------------ */
+const csData = {
+  sashushi: {
+    bg: '#0a0f0a', accent: '#4ade80', tag: 'Restaurant',
+    title: 'Sa Sushi',
+    subtitle: 'Restaurant Website & Menu System',
+    sections: [
+      { label: 'Challenge', title: 'No online presence.',
+        text: 'A local sushi restaurant losing orders to competitors on delivery apps. No website, no online menu — invisible to anyone who searched.' },
+      { label: 'Solution', title: 'Dark luxury, built to order.',
+        text: 'Full site with dark/sage green aesthetic, complete Uber Eats menu integration, and mobile-first ordering. Built to match the ambiance of the restaurant itself.' },
+      { label: 'Result', title: 'Online in 5 days.',
+        text: 'Demo built before any payment. Live before the end of the week. The restaurant now has a digital presence that matches the quality of their food.' }
+    ],
+    tags: ['Restaurant', 'Menu', 'Mobile', 'Dark Theme']
+  },
+  lorenas: {
+    bg: '#080d14', accent: '#60a5fa', tag: 'Cleaning Service',
+    title: "Lorena's Cleaning",
+    subtitle: 'Service Business Portal',
+    sections: [
+      { label: 'Challenge', title: 'Four teams, zero digital.',
+        text: '4 cleaning teams with no digital booking. Scheduling done entirely by phone — missed calls meant missed revenue. No way to track jobs, payments, or client history.' },
+      { label: 'Solution', title: 'Full stack, one portal.',
+        text: 'Client portal + admin dashboard with Stripe payments, team scheduling across 4 crews, and Google Analytics. One login. Everything in one place.' },
+      { label: 'Result', title: 'Live client. Ongoing.',
+        text: 'Now a fully live client. The portal handles bookings, billing, and team management automatically. We continue to build on it together.' }
+    ],
+    tags: ['Cleaning', 'Portal', 'Stripe', 'Admin Dashboard']
+  },
+  victors: {
+    bg: '#0f0a06', accent: '#fb923c', tag: 'Retail',
+    title: "Victor's Supermarket",
+    subtitle: 'Retail & WhatsApp Ordering',
+    sections: [
+      { label: 'Challenge', title: 'Competing against chains.',
+        text: 'A local supermarket with no digital ordering, competing against national chains that had apps and delivery. Customers had no way to order from home.' },
+      { label: 'Solution', title: 'WhatsApp meets the web.',
+        text: 'Website + WhatsApp ordering + admin with CSV import, built around the existing PC America POS system. No rip-and-replace — works with what they already had.' },
+      { label: 'Result', title: 'Orders via WhatsApp.',
+        text: 'Customers now order through the site, routed straight into their WhatsApp. Simple, familiar, and it actually gets used every day.' }
+    ],
+    tags: ['Retail', 'WhatsApp', 'POS Integration', 'Admin']
+  },
+  fma: {
+    bg: '#0a080f', accent: '#a78bfa', tag: 'Construction',
+    title: 'FMA Constructions',
+    subtitle: 'Construction Business Site',
+    sections: [
+      { label: 'Challenge', title: 'Invisible to the web.',
+        text: 'A family construction business with no online presence, losing leads to competitors with even basic sites. Phone-only discovery meant they were invisible to anyone who searched.' },
+      { label: 'Solution', title: 'Built to be found.',
+        text: 'Business site showcasing kitchen, bath, and flooring services with a project gallery, quote request system, and full SEO optimization for Northeast Philly searches.' },
+      { label: 'Result', title: 'Professional presence.',
+        text: 'A professional online presence for a professional team. The site ranks for local searches and gives potential clients exactly what they need to make the call.' }
+    ],
+    tags: ['Construction', 'Services', 'SEO', 'Lead Generation']
+  }
+};
+
+const cspEl   = document.getElementById('case-study-page');
+let csOpen    = false;
+let activeCard = null;
+let morphEl   = null;
+
+function renderCaseStudy(data) {
+  const sHTML = data.sections.map((s, i) => `
+    <div class="cs-section">
+      <div class="cs-sec-num">0${i+1}</div>
+      <div>
+        <div class="cs-sec-label" style="color:${data.accent}">${s.label}</div>
+        <div class="cs-sec-title">${s.title}</div>
+        <p class="cs-sec-text">${s.text}</p>
+      </div>
+    </div>`).join('');
+
+  const tHTML = data.tags.map(t => `<span class="cs-pill">${t}</span>`).join('');
+
+  cspEl.innerHTML = `
+    <button class="cs-back" id="cs-back-btn">Back to work</button>
+    <div class="cs-hero" style="background:${data.bg}">
+      <p class="cs-tag-label" style="color:${data.accent}">${data.tag}</p>
+      <h2 class="cs-title">${data.title}</h2>
+      <p class="cs-subtitle">${data.subtitle}</p>
+    </div>
+    <div class="cs-body" style="background:${data.bg}">
+      ${sHTML}
+      <div class="cs-tags-row">${tHTML}</div>
+    </div>`;
+
+  const backBtn = document.getElementById('cs-back-btn');
+  backBtn.addEventListener('click', closeCaseStudy);
+  backBtn.addEventListener('mouseenter', () => setCursorState('dot'));
+  backBtn.addEventListener('mouseleave', () => setCursorState('reset'));
+}
+
+function fireCsAnimations() {
+  gsap.set(['.cs-back','.cs-tag-label','.cs-title','.cs-subtitle','.cs-section','.cs-tags-row'],
+    { clearProps: 'all' });
+  gsap.fromTo('.cs-back',     { opacity: 0 },         { opacity: 1, duration: 0.4, delay: 0.15 });
+  gsap.fromTo('.cs-tag-label',{ opacity: 0 },         { opacity: 1, duration: 0.4, delay: 0.1 });
+  gsap.fromTo('.cs-title',    { y: 50, opacity: 0 },  { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay: 0.2 });
+  gsap.fromTo('.cs-subtitle', { y: 22, opacity: 0 },  { y: 0, opacity: 1, duration: 0.7, delay: 0.45 });
+  gsap.fromTo('.cs-section',  { y: 32, opacity: 0 },  { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, delay: 0.55 });
+  gsap.fromTo('.cs-tags-row', { opacity: 0 },         { opacity: 1, duration: 0.5, delay: 0.9 });
+}
+
+function openCaseStudy(projectId, cardEl) {
+  if (isTransitioning || csOpen) return;
+  const data = csData[projectId];
+  if (!data) return;
+
+  csOpen     = true;
+  activeCard = cardEl;
+  renderCaseStudy(data);
+  cspEl.scrollTop = 0;
+  cspEl.style.background = data.bg;
+
+  if (window.innerWidth < 768) {
+    /* Mobile: use overlay transition */
+    transitionLeave().then(() => {
+      cspEl.style.opacity       = '1';
+      cspEl.style.pointerEvents = 'all';
+      lenis.stop();
+      transitionEnter(() => fireCsAnimations());
+    });
+    return;
+  }
+
+  /* Desktop: card morph */
+  const rect   = cardEl.getBoundingClientRect();
+  const cardBg = getComputedStyle(cardEl).backgroundColor;
+  lenis.stop();
+  isTransitioning = true;
+
+  gsap.to([cardEl.querySelector('.wk-inner'), cardEl.querySelector('.wk-overlay')],
+    { opacity: 0, duration: 0.2 });
+  wkCards.filter(c => c !== cardEl).forEach(c =>
+    gsap.to(c, { opacity: 0, duration: 0.35 })
+  );
+
+  morphEl = document.createElement('div');
+  morphEl.style.cssText = `position:fixed;z-index:9988;pointer-events:none;border-radius:2px;
+    top:${rect.top}px;left:${rect.left}px;
+    width:${rect.width}px;height:${rect.height}px;
+    background:${cardBg};will-change:top,left,width,height;`;
+  document.body.appendChild(morphEl);
+
+  gsap.to(morphEl, {
+    top: 0, left: 0, width: '100vw', height: '100vh', borderRadius: 0,
+    duration: 0.55, ease: 'power3.inOut',
+    onComplete() {
+      cspEl.style.pointerEvents = 'all';
+      gsap.fromTo(cspEl, { opacity: 0 }, {
+        opacity: 1, duration: 0.3, ease: 'power2.out',
+        onComplete() {
+          if (morphEl) { morphEl.remove(); morphEl = null; }
+          isTransitioning = false;
+          fireCsAnimations();
+        }
+      });
+    }
+  });
+}
+
+function closeCaseStudy() {
+  if (isTransitioning || !csOpen) return;
+
+  if (window.innerWidth < 768) {
+    transitionLeave().then(() => {
+      cspEl.style.opacity       = '0';
+      cspEl.style.pointerEvents = 'none';
+      cspEl.innerHTML           = '';
+      csOpen      = false;
+      activeCard  = null;
+      lenis.start();
+      transitionEnter();
+    });
+    return;
+  }
+
+  /* Desktop: fade out + restore cards */
+  isTransitioning = true;
+  gsap.to(cspEl, {
+    opacity: 0, duration: 0.35, ease: 'power2.in',
+    onComplete() {
+      cspEl.style.pointerEvents = 'none';
+      cspEl.innerHTML           = '';
+
+      wkCards.forEach(c => gsap.to(c, { opacity: 1, duration: 0.4 }));
+      if (activeCard) {
+        gsap.to([activeCard.querySelector('.wk-inner')], { opacity: 1, duration: 0.3, delay: 0.1 });
+      }
+      csOpen          = false;
+      activeCard      = null;
+      isTransitioning = false;
+      lenis.start();
+    }
+  });
+}
+
+/* Wire up work card clicks */
+const csProjectIds = ['sashushi', 'lorenas', 'victors', 'fma'];
+wkCards.forEach((card, i) => {
+  /* Prevent inner links from interfering */
+  card.querySelectorAll('a').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+  card.addEventListener('click', () => openCaseStudy(csProjectIds[i], card));
 });
 
 </script>
