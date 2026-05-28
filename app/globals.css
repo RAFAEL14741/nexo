@@ -1,26 +1,233 @@
 @import "tailwindcss";
 
+/* ============================================================
+   NEXO DESIGN SYSTEM — CSS Variables
+============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --dark:    #080808;
+  --cream:   #F2EFE8;
+  --accent:  #C9F135;
+  --muted:   #666666;
+  --dim:     #888888;
+  --border:  #1a1a1a;
+  --border-light: #E0DDD6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-dark:   #080808;
+  --color-cream:  #F2EFE8;
+  --color-accent: #C9F135;
+  --color-muted:  #666666;
+  --color-dim:    #888888;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   BASE STYLES
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--dark);
+  color: var(--cream);
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* Hide default cursor globally — custom Cursor component takes over */
+*, *::before, *::after {
+  cursor: none !important;
+}
+
+/* ============================================================
+   NOISE OVERLAY — subtle film grain texture
+============================================================ */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+}
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+============================================================ */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px currentColor;
+}
+
+.s-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.s-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   WORD / CHAR REVEAL SYSTEM
+   .ww = overflow mask, .wi = animated word inner
+   .cw = overflow mask, .ci = animated char inner
+============================================================ */
+.ww {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1.05;
+  margin-right: 0.22em;
+}
+.ww:last-child { margin-right: 0; }
+.wi {
+  display: inline-block;
+  will-change: transform;
+}
+
+.cw {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1.05;
+}
+.ci {
+  display: inline-block;
+  will-change: transform;
+}
+.char-word  { display: inline-block; }
+.char-sp    { display: inline-block; width: 0.28em; }
+
+/* ============================================================
+   SECTION LINE DRAW
+============================================================ */
+.section-line {
+  height: 1px;
+  background: currentColor;
+  width: 0%;
+  opacity: 0.15;
+  will-change: width;
+}
+
+/* ============================================================
+   FORM FLOATING LABELS
+============================================================ */
+.fg {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.fg input,
+.fg select,
+.fg textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0 10px;
+  font-size: 15px;
+  color: var(--cream);
+  outline: none;
+  transition: border-color 0.3s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  font-family: inherit;
+}
+
+.fg input:focus,
+.fg select:focus,
+.fg textarea:focus {
+  border-color: rgba(242, 239, 232, 0.35);
+}
+
+.fg label {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  font-size: 14px;
+  color: var(--muted);
+  pointer-events: none;
+  transition: top 0.22s ease, font-size 0.22s ease, letter-spacing 0.22s ease;
+}
+
+.fg input:focus + label,
+.fg input:not(:placeholder-shown) + label,
+.fg select:focus + label,
+.fg select:valid + label,
+.fg textarea:focus + label,
+.fg textarea:not(:placeholder-shown) + label {
+  top: 2px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.fg input::placeholder,
+.fg textarea::placeholder { color: transparent; }
+.fg select option { background: var(--dark); color: var(--cream); }
+.fg textarea { resize: none; min-height: 88px; }
+
+/* ============================================================
+   RIPPLE
+============================================================ */
+.ripple-el {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99988;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-left: -20px;
+  margin-top: -20px;
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   MARQUEE
+============================================================ */
+@keyframes mq-roll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.mq-track {
+  display: flex;
+  width: max-content;
+  animation: mq-roll 50s linear infinite;
+}
+
+.mq-wrap:hover .mq-track {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   SCROLL SNAP — work grid mobile
+============================================================ */
+@media (max-width: 767px) {
+  body { cursor: auto; }
+  * { cursor: auto !important; }
 }
