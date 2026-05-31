@@ -1,0 +1,15 @@
+{
+  "id": "session-1779933904534",
+  "startedAt": "2026-05-28T02:05:04.534Z",
+  "platform": "darwin",
+  "cwd": "/Users/rafaelrodrigues/Desktop/Projects/nexo-next",
+  "context": {},
+  "metrics": {
+    "edits": 75,
+    "commands": 0,
+    "tasks": 0,
+    "errors": 0
+  },
+  "endedAt": "2026-05-28T16:05:33.775Z",
+  "duration": 50429242
+}

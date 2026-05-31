@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedText from '@/components/AnimatedText';
+import ScrollReveal from '@/components/ScrollReveal';
 import { usePageTransition } from '@/providers/TransitionProvider';
 
 const BUSINESS_TYPES = [
@@ -13,10 +17,52 @@ const BUSINESS_TYPES = [
   'Other',
 ];
 
+type SubmitState = 'idle' | 'sending' | 'sent';
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  background: 'transparent',
+  border: '1px solid #1e1e1e',
+  color: '#F2EFE8',
+  padding: '14px 16px',
+  fontSize: 14,
+  outline: 'none',
+  transition: 'border-color 0.25s',
+  fontFamily: 'inherit',
+};
+
+function FormField({
+  label,
+  children,
+  delay = 0,
+}: {
+  label: string;
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  return (
+    <ScrollReveal delay={delay}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <label
+          style={{
+            fontSize: 10,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'rgba(242,239,232,0.35)',
+          }}
+        >
+          {label}
+        </label>
+        {children}
+      </div>
+    </ScrollReveal>
+  );
+}
+
 export default function ContactPage() {
   const router = useRouter();
   const { startTransition } = usePageTransition();
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [form, setForm] = useState({
     name: '',
     business: '',
@@ -26,13 +72,15 @@ export default function ContactPage() {
     message: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Formspree endpoint — replace XXXX with real form ID
+    setSubmitState('sending');
     try {
       await fetch('https://formspree.io/f/XXXXXXXX', {
         method: 'POST',
@@ -40,175 +88,384 @@ export default function ContactPage() {
         body: JSON.stringify(form),
       });
     } catch {
-      // fail silently — show success regardless
+      // fail silently
     }
-    setSubmitted(true);
+    setSubmitState('sent');
   };
 
   return (
-    <div style={{ background: '#080808', minHeight: '100vh', paddingTop: '120px' }}>
+    <PageTransition>
+      <div style={{ background: '#080808', minHeight: '100vh', paddingTop: 120 }}>
 
-      {/* Header */}
-      <div className="px-14 pb-20 border-b border-[#1a1a1a]">
-        <p className="text-[11px] tracking-[0.22em] text-[rgba(242,239,232,0.4)] uppercase mb-6">Get in touch</p>
-        <h1
-          className="text-[clamp(48px,8vw,110px)] font-black text-[#F2EFE8] leading-[0.88] tracking-[-0.04em]"
-          style={{ fontFamily: 'var(--font-syne)' }}
+        {/* Header */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '0 56px 80px',
+            borderBottom: '1px solid #1a1a1a',
+          }}
         >
-          Let&apos;s build your demo.{' '}
-          <span style={{ color: '#C9F135' }}>Free.</span>
-        </h1>
-        <p className="mt-8 text-[15px] text-[rgba(242,239,232,0.5)] max-w-[440px] leading-relaxed">
-          Fill this out and we&apos;ll have a demo ready for you to see within 48 hours. No card, no contract, no commitment.
-        </p>
-      </div>
-
-      {/* Form + sidebar */}
-      <div className="px-14 py-20 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-20">
-
-        {submitted ? (
-          <div className="flex flex-col gap-6">
-            <div className="text-[48px]">✓</div>
-            <h2
-              className="text-[32px] font-black text-[#F2EFE8]"
-              style={{ fontFamily: 'var(--font-syne)' }}
-            >
-              Got it — we&apos;ll be in touch.
-            </h2>
-            <p className="text-[15px] text-[rgba(242,239,232,0.55)] max-w-[400px] leading-relaxed">
-              Expect your demo within 48 hours. We&apos;ll send it to the email you provided.
-            </p>
-            <button
-              onClick={() => startTransition(() => router.push('/'))}
-              className="self-start text-[13px] text-[rgba(242,239,232,0.5)] hover:text-[#F2EFE8] transition-colors bg-transparent border-none mt-4"
-            >
-              ← Back to home
-            </button>
+          <AnimatedText
+            text="Get in touch"
+            delay={0.1}
+            className="text-[11px] tracking-[0.22em] uppercase text-[rgba(242,239,232,0.4)] mb-6"
+          />
+          <div style={{ marginBottom: 24 }}>
+            <AnimatedText
+              text="Let's talk."
+              delay={0.2}
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 800,
+                fontSize: 'clamp(48px,8vw,110px)',
+                lineHeight: 0.88,
+                letterSpacing: '-0.04em',
+                color: '#F2EFE8',
+              } as React.CSSProperties}
+            />
+            <AnimatedText
+              text="Demo in 48h."
+              delay={0.35}
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 800,
+                fontSize: 'clamp(48px,8vw,110px)',
+                lineHeight: 0.88,
+                letterSpacing: '-0.04em',
+                color: '#C9F135',
+              } as React.CSSProperties}
+            />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-            {/* Row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Your name</label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Rafael Rodrigues"
-                  className="bg-transparent border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] placeholder:text-[rgba(242,239,232,0.2)] focus:border-[#F2EFE8] outline-none transition-colors duration-200"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Business name</label>
-                <input
-                  name="business"
-                  value={form.business}
-                  onChange={handleChange}
-                  required
-                  placeholder="Sa Sushi"
-                  className="bg-transparent border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] placeholder:text-[rgba(242,239,232,0.2)] focus:border-[#F2EFE8] outline-none transition-colors duration-200"
-                />
-              </div>
-            </div>
+          <ScrollReveal delay={0.5}>
+            <p
+              style={{
+                fontSize: 15,
+                color: 'rgba(242,239,232,0.45)',
+                maxWidth: 440,
+                lineHeight: 1.7,
+              }}
+            >
+              Fill this out and we&apos;ll have a live demo ready for you within 48 hours.
+              No card, no contract, no commitment.
+            </p>
+          </ScrollReveal>
+        </div>
 
-            {/* Row 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Business type</label>
-                <select
-                  name="type"
-                  value={form.type}
-                  onChange={handleChange}
-                  required
-                  className="bg-[#080808] border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] focus:border-[#F2EFE8] outline-none transition-colors duration-200 appearance-none"
+        {/* Form area */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '72px 56px 96px',
+            display: 'grid',
+            gridTemplateColumns: '1fr minmax(0, 320px)',
+            gap: 80,
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {submitState === 'sent' ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+              >
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', damping: 10, delay: 0.2 }}
+                  style={{ fontSize: 56, lineHeight: 1 }}
                 >
-                  <option value="" disabled>Select type...</option>
-                  {BUSINESS_TYPES.map(t => (
-                    <option key={t} value={t}>{t}</option>
+                  ✓
+                </motion.div>
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-syne)',
+                    fontWeight: 800,
+                    fontSize: 32,
+                    color: '#F2EFE8',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  Got it — we&apos;ll be in touch.
+                </h2>
+                <p
+                  style={{
+                    fontSize: 15,
+                    color: 'rgba(242,239,232,0.5)',
+                    maxWidth: 380,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Expect your demo within 48 hours. We&apos;ll send it to the email you provided.
+                </p>
+                <motion.button
+                  whileHover={{ color: '#F2EFE8' }}
+                  onClick={() => startTransition(() => router.push('/'))}
+                  style={{
+                    alignSelf: 'flex-start',
+                    fontSize: 13,
+                    color: 'rgba(242,239,232,0.45)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: 12,
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  ← Back to home
+                </motion.button>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                onSubmit={handleSubmit}
+                style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 20,
+                  }}
+                >
+                  <FormField label="Your name" delay={0.1}>
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Rafael Rodrigues"
+                      style={inputStyle}
+                      onFocus={e => (e.currentTarget.style.borderColor = 'rgba(242,239,232,0.35)')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                    />
+                  </FormField>
+                  <FormField label="Business name" delay={0.12}>
+                    <input
+                      name="business"
+                      value={form.business}
+                      onChange={handleChange}
+                      required
+                      placeholder="Sa Sushi"
+                      style={inputStyle}
+                      onFocus={e => (e.currentTarget.style.borderColor = 'rgba(242,239,232,0.35)')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                    />
+                  </FormField>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 20,
+                  }}
+                >
+                  <FormField label="Business type" delay={0.15}>
+                    <select
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      required
+                      style={{
+                        ...inputStyle,
+                        background: '#080808',
+                        appearance: 'none',
+                      }}
+                      onFocus={e => (e.currentTarget.style.borderColor = 'rgba(242,239,232,0.35)')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                    >
+                      <option value="" disabled>Select type...</option>
+                      {BUSINESS_TYPES.map(t => (
+                        <option key={t} value={t} style={{ background: '#080808' }}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                  <FormField label="Email" delay={0.18}>
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="you@example.com"
+                      style={inputStyle}
+                      onFocus={e => (e.currentTarget.style.borderColor = '#C9F135')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                    />
+                  </FormField>
+                </div>
+
+                <FormField label="Phone (optional)" delay={0.2}>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="(215) 555-0100"
+                    style={inputStyle}
+                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(242,239,232,0.35)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                  />
+                </FormField>
+
+                <FormField label="Anything else we should know?" delay={0.22}>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    rows={4}
+                    placeholder="Tell us about your business, what you need, or anything specific..."
+                    style={{ ...inputStyle, resize: 'none', minHeight: 100 }}
+                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(242,239,232,0.35)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = '#1e1e1e')}
+                  />
+                </FormField>
+
+                <ScrollReveal delay={0.28}>
+                  <motion.button
+                    type="submit"
+                    data-cursor="go"
+                    disabled={submitState === 'sending'}
+                    whileHover={submitState === 'idle' ? { scale: 1.02, backgroundColor: '#d4f55a' } : {}}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      alignSelf: 'flex-start',
+                      padding: '16px 40px',
+                      background: '#C9F135',
+                      color: '#080808',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      border: 'none',
+                      cursor: submitState === 'sending' ? 'wait' : 'pointer',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      minWidth: 240,
+                    }}
+                  >
+                    <AnimatePresence mode="wait">
+                      {submitState === 'idle' && (
+                        <motion.span
+                          key="idle"
+                          initial={{ y: 0, opacity: 1 }}
+                          exit={{ y: -20, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          style={{ display: 'block' }}
+                        >
+                          Request My Free Demo →
+                        </motion.span>
+                      )}
+                      {submitState === 'sending' && (
+                        <motion.span
+                          key="sending"
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -20, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          style={{ display: 'block' }}
+                        >
+                          Sending...
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                </ScrollReveal>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
+          {/* Sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+            <ScrollReveal delay={0.3}>
+              <div>
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.3)',
+                    marginBottom: 10,
+                  }}
+                >
+                  Email us directly
+                </p>
+                <motion.a
+                  href="mailto:hello@nexo.agency"
+                  whileHover={{ color: '#C9F135' }}
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: '#F2EFE8',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  hello@nexo.agency
+                </motion.a>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.35}>
+              <div>
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.3)',
+                    marginBottom: 10,
+                  }}
+                >
+                  We serve
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {['Mayfair', 'Bustleton', 'Rhawnhurst', 'Fox Chase', 'Holmesburg', 'All of NE Philly'].map(area => (
+                    <span key={area} style={{ fontSize: 13, color: 'rgba(242,239,232,0.45)' }}>
+                      {area}
+                    </span>
                   ))}
-                </select>
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="you@example.com"
-                  className="bg-transparent border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] placeholder:text-[rgba(242,239,232,0.2)] focus:border-[#F2EFE8] outline-none transition-colors duration-200"
-                />
-              </div>
-            </div>
+            </ScrollReveal>
 
-            {/* Phone */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Phone (optional)</label>
-              <input
-                type="tel"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="(215) 555-0100"
-                className="bg-transparent border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] placeholder:text-[rgba(242,239,232,0.2)] focus:border-[#F2EFE8] outline-none transition-colors duration-200"
-              />
-            </div>
-
-            {/* Message */}
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.4)] uppercase">Anything else we should know?</label>
-              <textarea
-                name="message"
-                value={form.message}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Tell us about your business, what you need, or anything specific you want on the site..."
-                className="bg-transparent border border-[#2a2a2a] text-[#F2EFE8] px-4 py-3 text-[14px] placeholder:text-[rgba(242,239,232,0.2)] focus:border-[#F2EFE8] outline-none transition-colors duration-200 resize-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              data-cursor="go"
-              className="self-start px-10 py-4 bg-[#C9F135] text-[#080808] text-[13px] font-bold tracking-wider uppercase hover:bg-[#d4f55a] transition-colors duration-200"
-            >
-              Request My Free Demo →
-            </button>
-          </form>
-        )}
-
-        {/* Sidebar */}
-        <div className="flex flex-col gap-10 pt-2">
-          <div>
-            <p className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.35)] uppercase mb-3">Email us directly</p>
-            <a
-              href="mailto:hello@nexo.agency"
-              className="text-[15px] font-bold text-[#F2EFE8] hover:text-[#C9F135] transition-colors duration-200"
-            >
-              hello@nexo.agency
-            </a>
-          </div>
-
-          <div>
-            <p className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.35)] uppercase mb-3">We serve</p>
-            <div className="flex flex-col gap-1">
-              {['Mayfair', 'Bustleton', 'Rhawnhurst', 'Fox Chase', 'Holmesburg', 'All of NE Philly'].map(area => (
-                <span key={area} className="text-[13px] text-[rgba(242,239,232,0.5)]">{area}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className="border border-[#1a1a1a] p-6">
-            <p className="text-[11px] tracking-[0.16em] text-[rgba(242,239,232,0.35)] uppercase mb-3">Our promise</p>
-            <p className="text-[13px] text-[rgba(242,239,232,0.6)] leading-relaxed">
-              Demo in 48h. No card required. No contract until you say yes.
-            </p>
+            <ScrollReveal delay={0.4}>
+              <motion.div
+                whileHover={{ borderColor: '#2a2a2a' }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  border: '1px solid #1a1a1a',
+                  padding: 24,
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.3)',
+                    marginBottom: 10,
+                  }}
+                >
+                  Our promise
+                </p>
+                <p style={{ fontSize: 13, color: 'rgba(242,239,232,0.55)', lineHeight: 1.7 }}>
+                  Demo in 48h. No card required. No contract until you say yes.
+                </p>
+              </motion.div>
+            </ScrollReveal>
           </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

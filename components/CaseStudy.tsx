@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedText from '@/components/AnimatedText';
+import ScrollReveal from '@/components/ScrollReveal';
 import { usePageTransition } from '@/providers/TransitionProvider';
 
 interface CaseStudyProps {
@@ -20,131 +21,312 @@ interface CaseStudyProps {
 }
 
 export default function CaseStudy({
-  tag, title, subtitle, accent, bg,
-  overview, challenge, solution, results, tags,
+  tag,
+  title,
+  subtitle,
+  accent,
+  bg,
+  overview,
+  challenge,
+  solution,
+  results,
+  tags,
 }: CaseStudyProps) {
   const router = useRouter();
   const { startTransition } = usePageTransition();
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    document.querySelectorAll<HTMLElement>('.cs-fade').forEach(el => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-        }
-      );
-    });
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
-  }, []);
-
   return (
-    <div style={{ background: bg, minHeight: '100vh' }}>
-      {/* Hero */}
-      <div
-        className="min-h-screen flex flex-col justify-end px-14 pb-24 pt-40"
-        style={{ background: bg }}
-      >
-        <button
-          onClick={() => startTransition(() => router.push('/work'))}
-          className="self-start mb-16 text-[11px] tracking-[0.18em] uppercase bg-transparent border-none p-0"
-          style={{ color: `${accent}99` }}
+    <PageTransition>
+      <div style={{ background: bg, minHeight: '100vh' }}>
+
+        {/* Hero */}
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            padding: '0 56px 96px',
+            paddingTop: 160,
+            background: bg,
+          }}
         >
-          ← Back to work
-        </button>
-
-        <span
-          className="text-[10px] tracking-[0.22em] uppercase block mb-4"
-          style={{ color: accent }}
-        >
-          {tag}
-        </span>
-        <h1
-          className="text-[clamp(48px,9vw,120px)] font-black leading-[0.88] tracking-[-0.04em] text-[#F2EFE8] mb-6"
-          style={{ fontFamily: 'var(--font-syne)' }}
-        >
-          {title}
-        </h1>
-        <p className="text-[16px] text-[rgba(242,239,232,0.5)] max-w-[480px] leading-relaxed">
-          {subtitle}
-        </p>
-      </div>
-
-      {/* Content */}
-      <div className="px-14 py-24 flex flex-col gap-24" style={{ background: '#080808' }}>
-
-        {/* Overview */}
-        <div className="cs-fade">
-          <p className="text-[11px] tracking-[0.2em] uppercase mb-6" style={{ color: accent }}>Overview</p>
-          <p className="text-[18px] text-[rgba(242,239,232,0.8)] leading-relaxed max-w-[700px]">{overview}</p>
-        </div>
-
-        {/* Challenge + Solution */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 cs-fade">
-          <div>
-            <p className="text-[11px] tracking-[0.2em] uppercase mb-4 text-[rgba(242,239,232,0.4)]">The Challenge</p>
-            <p className="text-[15px] text-[rgba(242,239,232,0.6)] leading-relaxed">{challenge}</p>
-          </div>
-          <div>
-            <p className="text-[11px] tracking-[0.2em] uppercase mb-4 text-[rgba(242,239,232,0.4)]">Our Solution</p>
-            <p className="text-[15px] text-[rgba(242,239,232,0.6)] leading-relaxed">{solution}</p>
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="cs-fade">
-          <p className="text-[11px] tracking-[0.2em] uppercase mb-8" style={{ color: accent }}>Results</p>
-          <div className="flex flex-col gap-4">
-            {results.map((r, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-4 border-b border-[#1a1a1a] pb-4"
-              >
-                <span className="text-[20px] shrink-0 mt-0.5" style={{ color: accent }}>↗</span>
-                <p className="text-[15px] text-[#F2EFE8]">{r}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="cs-fade flex flex-wrap gap-3">
-          {tags.map(t => (
-            <span
-              key={t}
-              className="text-[11px] tracking-[0.16em] uppercase px-4 py-2 border"
-              style={{ borderColor: `${accent}40`, color: accent }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Next project CTA */}
-        <div className="cs-fade pt-8 border-t border-[#1a1a1a] flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          <div>
-            <p className="text-[11px] tracking-[0.2em] text-[rgba(242,239,232,0.4)] uppercase mb-3">Want something like this?</p>
-            <p className="text-[20px] font-black text-[#F2EFE8]" style={{ fontFamily: 'var(--font-syne)' }}>
-              Your demo is free. No commitment.
-            </p>
-          </div>
-          <button
-            onClick={() => startTransition(() => router.push('/contact'))}
-            data-cursor="go"
-            className="px-8 py-4 bg-[#C9F135] text-[#080808] text-[13px] font-bold tracking-wider uppercase hover:bg-[#d4f55a] transition-colors duration-200 shrink-0"
+          <motion.button
+            onClick={() => startTransition(() => router.push('/work'))}
+            whileHover={{ x: -4 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              alignSelf: 'flex-start',
+              marginBottom: 64,
+              fontSize: 11,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: `${accent}99`,
+              padding: 0,
+            }}
           >
-            Get Your Free Demo
-          </button>
+            ← Back to work
+          </motion.button>
+
+          <motion.span
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            style={{
+              fontSize: 10,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: accent,
+              display: 'block',
+              marginBottom: 16,
+            }}
+          >
+            {tag}
+          </motion.span>
+
+          <AnimatedText
+            text={title}
+            delay={0.4}
+            style={{
+              fontFamily: 'var(--font-syne)',
+              fontWeight: 800,
+              fontSize: 'clamp(48px,9vw,120px)',
+              lineHeight: 0.88,
+              letterSpacing: '-0.04em',
+              color: '#F2EFE8',
+              marginBottom: 24,
+            } as React.CSSProperties}
+          />
+
+          <ScrollReveal delay={0.65}>
+            <p
+              style={{
+                fontSize: 16,
+                color: 'rgba(242,239,232,0.5)',
+                maxWidth: 480,
+                lineHeight: 1.7,
+              }}
+            >
+              {subtitle}
+            </p>
+          </ScrollReveal>
+        </div>
+
+        {/* Content */}
+        <div
+          style={{
+            background: '#080808',
+            padding: '96px 56px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 96,
+          }}
+        >
+
+          {/* Overview */}
+          <ScrollReveal>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <p
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: accent,
+                  marginBottom: 24,
+                }}
+              >
+                Overview
+              </p>
+              <p
+                style={{
+                  fontSize: 18,
+                  color: 'rgba(242,239,232,0.75)',
+                  lineHeight: 1.75,
+                  maxWidth: 520,
+                }}
+              >
+                {overview}
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* Challenge + Solution */}
+          <ScrollReveal delay={0.1}>
+            <div
+              style={{
+                maxWidth: 1200,
+                margin: '0 auto',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 64,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.35)',
+                    marginBottom: 16,
+                  }}
+                >
+                  The Challenge
+                </p>
+                <p style={{ fontSize: 15, color: 'rgba(242,239,232,0.6)', lineHeight: 1.75 }}>
+                  {challenge}
+                </p>
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.35)',
+                    marginBottom: 16,
+                  }}
+                >
+                  Our Solution
+                </p>
+                <p style={{ fontSize: 15, color: 'rgba(242,239,232,0.6)', lineHeight: 1.75 }}>
+                  {solution}
+                </p>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Results */}
+          <ScrollReveal delay={0.1}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <p
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: accent,
+                  marginBottom: 32,
+                }}
+              >
+                Results
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {results.map((r, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 16,
+                      borderBottom: '1px solid #1a1a1a',
+                      padding: '18px 0',
+                    }}
+                  >
+                    <span style={{ fontSize: 18, color: accent, flexShrink: 0, marginTop: 2 }}>
+                      ↗
+                    </span>
+                    <p style={{ fontSize: 15, color: '#F2EFE8', lineHeight: 1.6 }}>{r}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Tags */}
+          <ScrollReveal>
+            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {tags.map((t, i) => (
+                <motion.span
+                  key={t}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    padding: '6px 16px',
+                    border: `1px solid ${accent}40`,
+                    color: accent,
+                  }}
+                >
+                  {t}
+                </motion.span>
+              ))}
+            </div>
+          </ScrollReveal>
+
+          {/* Next project CTA */}
+          <ScrollReveal>
+            <div
+              style={{
+                maxWidth: 1200,
+                margin: '0 auto',
+                paddingTop: 32,
+                borderTop: '1px solid #1a1a1a',
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 32,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(242,239,232,0.35)',
+                    marginBottom: 12,
+                  }}
+                >
+                  Want something like this?
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-syne)',
+                    fontWeight: 800,
+                    fontSize: 20,
+                    color: '#F2EFE8',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  Your demo is free. No commitment.
+                </p>
+              </div>
+              <motion.button
+                onClick={() => startTransition(() => router.push('/contact'))}
+                data-cursor="go"
+                whileHover={{ scale: 1.03, backgroundColor: '#d4f55a' }}
+                whileTap={{ scale: 0.97 }}
+                style={{
+                  padding: '16px 36px',
+                  background: '#C9F135',
+                  color: '#080808',
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                Get Your Free Demo
+              </motion.button>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

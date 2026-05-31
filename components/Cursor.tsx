@@ -1,152 +1,120 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { useEffect, useState } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 type CursorMode = 'default' | 'hover' | 'view' | 'go';
 
 export default function Cursor() {
-  const curRef   = useRef<HTMLDivElement>(null);
-  const txtRef   = useRef<HTMLSpanElement>(null);
-  const txRef    = useRef(-100);
-  const tyRef    = useRef(-100);
-  const cxRef    = useRef(-100);
-  const cyRef    = useRef(-100);
   const [mode, setMode] = useState<CursorMode>('default');
-  const modeRef  = useRef<CursorMode>('default');
-  const [text, setText] = useState('');
+  const [label, setLabel] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  const rawX = useMotionValue(-100);
+  const rawY = useMotionValue(-100);
+  const x = useSpring(rawX, { damping: 22, stiffness: 320 });
+  const y = useSpring(rawY, { damping: 22, stiffness: 320 });
 
   useEffect(() => {
-    const cur  = curRef.current;
-    const txt  = txtRef.current;
-    if (!cur || !txt) return;
-
-    /* Smooth following via GSAP ticker */
-    const tick = () => {
-      cxRef.current += (txRef.current - cxRef.current) * 0.12;
-      cyRef.current += (tyRef.current - cyRef.current) * 0.12;
-      gsap.set(cur, { x: cxRef.current - 16, y: cyRef.current - 16 });
-    };
-    gsap.ticker.add(tick);
+    setMounted(true);
 
     const onMove = (e: MouseEvent) => {
-      txRef.current = e.clientX;
-      tyRef.current = e.clientY;
+      rawX.set(e.clientX - 16);
+      rawY.set(e.clientY - 16);
     };
     window.addEventListener('mousemove', onMove);
 
-    /* Cursor state helpers */
-    const setCursorMode = (m: CursorMode, label = '') => {
-      if (modeRef.current === m) return;
-      modeRef.current = m;
+    let current: CursorMode = 'default';
+
+    const set = (m: CursorMode, lbl = '') => {
+      if (current === m) return;
+      current = m;
       setMode(m);
-      setText(label);
-
-      gsap.killTweensOf(cur);
-      gsap.killTweensOf(txt);
-
-      switch (m) {
-        case 'view':
-          gsap.to(cur, { scale: 3,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 1, duration: 0.15 });
-          break;
-        case 'go':
-          gsap.to(cur, { scale: 2,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 1, duration: 0.15 });
-          break;
-        case 'hover':
-          gsap.to(cur, { scale: 2.5, duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 0, duration: 0.1 });
-          break;
-        default:
-          gsap.to(cur, { scale: 1,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 0, duration: 0.1 });
-      }
+      setLabel(lbl);
     };
-    const resetCursor = () => setCursorMode('default');
 
-    /* Wire up hover targets */
-    const wireHover = (sel: string, m: CursorMode, label = '') => {
-      document.querySelectorAll<HTMLElement>(sel).forEach(el => {
-        el.addEventListener('mouseenter', () => setCursorMode(m, label));
-        el.addEventListener('mouseleave', resetCursor);
+    const reset = () => set('default');
+
+    const wire = () => {
+      document.querySelectorAll<HTMLElement>('a:not([data-cw]), button:not([data-cw])').forEach(el => {
+        el.addEventListener('mouseenter', () => set('hover'));
+        el.addEventListener('mouseleave', reset);
+        el.setAttribute('data-cw', '1');
+      });
+      document.querySelectorAll<HTMLElement>('input, select, textarea').forEach(el => {
+        if (el.getAttribute('data-cw')) return;
+        el.addEventListener('mouseenter', () => set('hover'));
+        el.addEventListener('mouseleave', reset);
+        el.setAttribute('data-cw', '1');
+      });
+      document.querySelectorAll<HTMLElement>('[data-cursor="view"]:not([data-cw])').forEach(el => {
+        el.addEventListener('mouseenter', () => set('view', 'VIEW'));
+        el.addEventListener('mouseleave', reset);
+        el.setAttribute('data-cw', '1');
+      });
+      document.querySelectorAll<HTMLElement>('[data-cursor="go"]:not([data-cw])').forEach(el => {
+        el.addEventListener('mouseenter', () => set('go', 'GO'));
+        el.addEventListener('mouseleave', reset);
+        el.setAttribute('data-cw', '1');
       });
     };
 
-    /* Use MutationObserver so dynamically added elements get wired too */
-    const wire = () => {
-      wireHover('a:not([data-cursor-wired])', 'hover');
-      wireHover('button:not([data-cursor-wired])', 'hover');
-      wireHover('input, select, textarea', 'hover');
-      wireHover('[data-cursor="view"]', 'view', 'VIEW');
-      wireHover('[data-cursor="go"]', 'go', 'GO');
-      /* Mark elements as wired */
-      document.querySelectorAll('a, button').forEach(el =>
-        el.setAttribute('data-cursor-wired', '1')
-      );
-    };
-
     wire();
-
-    const observer = new MutationObserver(wire);
-    observer.observe(document.body, { childList: true, subtree: true });
+    const obs = new MutationObserver(wire);
+    obs.observe(document.body, { childList: true, subtree: true });
 
     return () => {
-      gsap.ticker.remove(tick);
       window.removeEventListener('mousemove', onMove);
-      observer.disconnect();
+      obs.disconnect();
     };
-  }, []);
+  }, [rawX, rawY]);
 
-  /* Visible only on desktop (hidden via CSS on mobile) */
+  if (!mounted) return null;
+
+  const scale = mode === 'view' ? 3 : mode === 'go' ? 2.2 : mode === 'hover' ? 2.5 : 1;
+  const bg =
+    mode === 'hover'
+      ? 'rgba(255,255,255,0.9)'
+      : mode === 'view' || mode === 'go'
+      ? 'rgba(10,10,10,0.9)'
+      : 'transparent';
+  const borderColor =
+    mode === 'view' || mode === 'go' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,1)';
+  const blendMode: React.CSSProperties['mixBlendMode'] =
+    mode === 'view' || mode === 'go' ? 'normal' : 'difference';
+
   return (
-    <div
-      ref={curRef}
+    <motion.div
       aria-hidden="true"
-      className="fixed top-0 left-0 z-[99999] pointer-events-none hidden md:block"
+      className="fixed top-0 left-0 z-[99999] pointer-events-none hidden md:flex items-center justify-center"
       style={{
+        x,
+        y,
         width: 32,
         height: 32,
         borderRadius: '50%',
-        border: '1.5px solid white',
-        background:
-          mode === 'hover' || mode === 'view' || mode === 'go'
-            ? mode === 'hover'
-              ? 'white'
-              : 'rgba(12,12,12,0.92)'
-            : 'transparent',
-        borderColor:
-          mode === 'view' || mode === 'go'
-            ? 'rgba(255,255,255,0.12)'
-            : 'white',
-        mixBlendMode: mode === 'view' || mode === 'go' ? 'normal' : 'difference',
-        willChange: 'transform',
-        transition: 'background 0.15s, border-color 0.15s, mix-blend-mode 0s',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        border: `1.5px solid ${borderColor}`,
+        background: bg,
+        mixBlendMode: blendMode,
       }}
+      animate={{ scale }}
+      transition={{ type: 'spring', damping: 22, stiffness: 320 }}
     >
-      <span
-        ref={txtRef}
+      <motion.span
+        animate={{ opacity: label ? 1 : 0 }}
+        transition={{ duration: 0.15 }}
         style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           fontFamily: 'var(--font-syne)',
-          fontSize: 8,
+          fontSize: 7,
           fontWeight: 800,
-          letterSpacing: '0.06em',
+          letterSpacing: '0.08em',
           color: 'white',
-          opacity: 0,
           userSelect: 'none',
-          pointerEvents: 'none',
+          lineHeight: 1,
         }}
       >
-        {text}
-      </span>
-    </div>
+        {label}
+      </motion.span>
+    </motion.div>
   );
 }

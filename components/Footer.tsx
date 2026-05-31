@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { usePageTransition } from '@/providers/TransitionProvider';
 
 const FOOTER_LINKS = [
@@ -18,41 +19,94 @@ export default function Footer() {
 
   return (
     <footer
-      className="border-t border-[#1a1a1a] px-14 py-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
-      style={{ background: '#080808' }}
+      style={{
+        background: '#080808',
+        borderTop: '1px solid #1a1a1a',
+        padding: '64px 56px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: 40,
+      }}
     >
       {/* Logo + tagline */}
-      <div className="flex flex-col gap-3">
-        <button
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <motion.button
           onClick={() => goTo('/')}
-          className="text-[#F2EFE8] text-[15px] font-black tracking-[0.14em] uppercase bg-transparent border-none p-0 text-left"
-          style={{ fontFamily: 'var(--font-syne)' }}
+          whileHover={{ letterSpacing: '0.22em' }}
+          transition={{ duration: 0.3 }}
+          style={{
+            fontFamily: 'var(--font-syne)',
+            fontWeight: 800,
+            fontSize: 15,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#F2EFE8',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            textAlign: 'left',
+          }}
         >
           NEXO
-        </button>
-        <p className="text-[12px] text-[rgba(242,239,232,0.4)] max-w-[260px] leading-relaxed">
-          Premium websites for Northeast Philadelphia businesses. Free demo — pay only when you love it.
+        </motion.button>
+        <p
+          style={{
+            fontSize: 12,
+            color: 'rgba(242,239,232,0.35)',
+            maxWidth: 260,
+            lineHeight: 1.65,
+          }}
+        >
+          Premium websites for Northeast Philadelphia businesses.
+          Free demo — pay only when you love it.
         </p>
       </div>
 
       {/* Nav links */}
       <nav>
-        <ul className="flex flex-wrap gap-7 list-none">
+        <ul
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px 28px',
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+          }}
+        >
           {FOOTER_LINKS.map(l => (
             <li key={l.href}>
-              <button
+              <motion.button
                 onClick={() => goTo(l.href)}
-                className="text-[13px] text-[rgba(242,239,232,0.5)] hover:text-[#F2EFE8] transition-colors duration-200 bg-transparent border-none p-0"
+                whileHover={{ color: '#F2EFE8' }}
+                transition={{ duration: 0.15 }}
+                style={{
+                  fontSize: 13,
+                  color: 'rgba(242,239,232,0.45)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
               >
                 {l.label}
-              </button>
+              </motion.button>
             </li>
           ))}
         </ul>
       </nav>
 
       {/* Copyright */}
-      <p className="text-[11px] text-[rgba(242,239,232,0.25)] tracking-wider">
+      <p
+        style={{
+          fontSize: 11,
+          color: 'rgba(242,239,232,0.2)',
+          letterSpacing: '0.12em',
+        }}
+      >
         © 2025 NEXO · NE Philadelphia
       </p>
     </footer>

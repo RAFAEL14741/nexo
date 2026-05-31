@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
+import { motion, AnimatePresence } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedText from '@/components/AnimatedText';
+import ScrollReveal from '@/components/ScrollReveal';
 import { usePageTransition } from '@/providers/TransitionProvider';
 
 const SERVICES = [
@@ -46,156 +48,389 @@ const SERVICES = [
 
 const FAQS = [
   { q: 'Is the demo really free?', a: "Yes. We build your site before any money changes hands. You see it live, working, with your business name and content. Then you decide." },
-  { q: 'What if I don\'t like it?', a: "You walk away. No contract, no invoice, no hard feelings. We've already invested the time to build something we're proud of." },
+  { q: "What if I don't like it?", a: "You walk away. No contract, no invoice, no hard feelings. We've already invested the time to build something we're proud of." },
   { q: 'How long does the demo take?', a: "Usually 24–48 hours. Sometimes faster for simpler sites. We'll tell you upfront." },
   { q: 'Do I need to pay for hosting?', a: "If you sign with us, hosting is included in our monthly care plan. If you want to manage it yourself, we'll set it up on GitHub Pages or Vercel — free." },
   { q: 'Can I update the site myself?', a: "For admin portals and dashboards, yes — we build custom edit interfaces. For the main site, updates are included in the monthly plan or quoted individually." },
 ];
 
-export default function ServicesPage() {
-  const router = useRouter();
-  const { startTransition } = usePageTransition();
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    document.querySelectorAll<HTMLElement>('.fade-up').forEach(el => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 28 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-        }
-      );
-    });
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
-  }, []);
-
-  const goTo = (href: string) => startTransition(() => router.push(href));
-
+function ServiceRow({ s, isOpen, onToggle }: { s: typeof SERVICES[0]; isOpen: boolean; onToggle: () => void }) {
   return (
-    <div style={{ background: '#080808', minHeight: '100vh', paddingTop: '120px' }}>
-      {/* Header */}
-      <div className="px-14 pb-24 border-b border-[#1a1a1a]">
-        <p className="text-[11px] tracking-[0.22em] text-[rgba(242,239,232,0.4)] uppercase mb-6">What we offer</p>
-        <h1
-          className="text-[clamp(48px,8vw,110px)] font-black text-[#F2EFE8] leading-[0.88] tracking-[-0.04em]"
-          style={{ fontFamily: 'var(--font-syne)' }}
+    <motion.div
+      layout
+      onHoverStart={onToggle}
+      onHoverEnd={() => isOpen && onToggle()}
+      style={{ borderBottom: '1px solid #1a1a1a', overflow: 'hidden' }}
+      animate={{ backgroundColor: isOpen ? '#0c0c0c' : '#080808' }}
+      transition={{ duration: 0.3 }}
+    >
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 32,
+          padding: '36px 0',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            color: 'rgba(242,239,232,0.2)',
+            letterSpacing: '0.1em',
+            flexShrink: 0,
+            width: 32,
+            paddingTop: 4,
+          }}
         >
-          Built for local.{' '}
-          <span style={{ WebkitTextStroke: '2px rgba(242,239,232,0.2)', color: 'transparent' } as React.CSSProperties}>
-            Priced fair.
-          </span>
-        </h1>
-        <p className="mt-8 text-[15px] text-[rgba(242,239,232,0.5)] max-w-[480px] leading-relaxed">
-          Every service starts with a free demo. Pricing listed is what we charge if you love it and want to launch.
-        </p>
-      </div>
+          {s.n}
+        </span>
 
-      {/* Services list */}
-      <div className="flex flex-col">
-        {SERVICES.map(s => (
-          <div
-            key={s.n}
-            className="border-b border-[#1a1a1a] px-14 py-16 flex flex-col md:flex-row gap-10 fade-up"
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-syne)',
+              fontWeight: 800,
+              fontSize: 'clamp(28px, 4vw, 52px)',
+              color: '#F2EFE8',
+              lineHeight: 1,
+              letterSpacing: '-0.03em',
+            }}
           >
-            <div className="md:w-12 shrink-0">
-              <span className="text-[11px] text-[rgba(242,239,232,0.25)] tracking-wider">{s.n}</span>
-            </div>
+            {s.title}
+          </h2>
+        </div>
 
-            <div className="flex-1">
-              <h2
-                className="text-[clamp(22px,3vw,40px)] font-black text-[#F2EFE8] leading-tight mb-4"
-                style={{ fontFamily: 'var(--font-syne)' }}
+        <div style={{ flexShrink: 0, textAlign: 'right', paddingTop: 4, marginLeft: 'auto' }}>
+          <p
+            style={{
+              fontSize: 10,
+              color: 'rgba(242,239,232,0.3)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              marginBottom: 4,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Starting at
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--font-syne)',
+              fontWeight: 800,
+              fontSize: 24,
+              color: '#C9F135',
+              whiteSpace: 'nowrap',
+              lineHeight: 1,
+            }}
+          >
+            {s.price}
+          </p>
+        </div>
+
+        <motion.span
+          animate={{ rotate: isOpen ? 45 : 0 }}
+          transition={{ duration: 0.3, ease: [0.76, 0, 0.24, 1] }}
+          style={{
+            fontSize: 22,
+            color: '#C9F135',
+            flexShrink: 0,
+            lineHeight: 1,
+            display: 'inline-block',
+            paddingTop: 4,
+          }}
+        >
+          +
+        </motion.span>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.38, ease: [0.76, 0, 0.24, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ paddingBottom: 36, paddingLeft: 64 }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(242,239,232,0.5)',
+                  lineHeight: 1.75,
+                  maxWidth: 480,
+                  marginBottom: 20,
+                }}
               >
-                {s.title}
-              </h2>
-              <p className="text-[14px] text-[rgba(242,239,232,0.55)] leading-relaxed max-w-[520px] mb-6">
                 {s.desc}
               </p>
-              <div className="flex flex-wrap gap-2">
-                {s.features.map(f => (
-                  <span
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {s.features.map((f, i) => (
+                  <motion.span
                     key={f}
-                    className="text-[10px] tracking-[0.14em] uppercase px-3 py-1.5 border border-[#2a2a2a] text-[rgba(242,239,232,0.4)]"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      padding: '4px 12px',
+                      border: '1px solid rgba(242,239,232,0.12)',
+                      borderRadius: 999,
+                      color: 'rgba(242,239,232,0.4)',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
                     {f}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
-            <div className="md:text-right shrink-0">
-              <p className="text-[11px] text-[rgba(242,239,232,0.35)] uppercase tracking-wider mb-1">Starting at</p>
-              <p
-                className="text-[24px] font-black text-[#C9F135]"
-                style={{ fontFamily: 'var(--font-syne)' }}
-              >
-                {s.price}
-              </p>
-            </div>
+export default function ServicesPage() {
+  const router = useRouter();
+  const { startTransition } = usePageTransition();
+  const [openService, setOpenService] = useState<number | null>(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const goTo = (href: string) => startTransition(() => router.push(href));
+
+  const toggleService = (i: number) => setOpenService(openService === i ? null : i);
+  const toggleFaq = (i: number) => setOpenFaq(openFaq === i ? null : i);
+
+  return (
+    <PageTransition>
+      <div style={{ background: '#080808', minHeight: '100vh', paddingTop: 120 }}>
+
+        {/* Header */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '0 56px 80px',
+            borderBottom: '1px solid #1a1a1a',
+          }}
+        >
+          <AnimatedText
+            text="What we offer"
+            delay={0.1}
+            className="text-[11px] tracking-[0.22em] uppercase text-[rgba(242,239,232,0.4)] mb-6"
+          />
+          <div style={{ marginBottom: 24 }}>
+            <AnimatedText
+              text="Built for local."
+              delay={0.2}
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 800,
+                fontSize: 'clamp(48px,8vw,110px)',
+                lineHeight: 0.88,
+                letterSpacing: '-0.04em',
+                color: '#F2EFE8',
+              } as React.CSSProperties}
+            />
+            <AnimatedText
+              text="Priced fair."
+              delay={0.35}
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 800,
+                fontSize: 'clamp(48px,8vw,110px)',
+                lineHeight: 0.88,
+                letterSpacing: '-0.04em',
+                color: 'transparent',
+                WebkitTextStroke: '2px rgba(242,239,232,0.2)',
+              } as React.CSSProperties}
+            />
           </div>
-        ))}
-      </div>
+          <ScrollReveal delay={0.5}>
+            <p
+              style={{
+                fontSize: 15,
+                color: 'rgba(242,239,232,0.45)',
+                maxWidth: 440,
+                lineHeight: 1.7,
+              }}
+            >
+              Every service starts with a free demo. Pricing listed is what we charge if you love it and want to launch.
+            </p>
+          </ScrollReveal>
+        </div>
 
-      {/* FAQ */}
-      <div className="px-14 py-24" style={{ background: '#F2EFE8' }}>
-        <p className="text-[11px] tracking-[0.2em] text-[rgba(8,8,8,0.4)] uppercase mb-12">Common questions</p>
-        <div className="flex flex-col">
-          {FAQS.map((faq, i) => (
-            <div key={i} className="border-b border-[rgba(8,8,8,0.12)] fade-up">
-              <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full py-6 flex items-center justify-between text-left bg-transparent border-none gap-4"
-              >
-                <span
-                  className="text-[16px] font-bold text-[#080808]"
-                  style={{ fontFamily: 'var(--font-syne)' }}
-                >
-                  {faq.q}
-                </span>
-                <span
-                  className="text-[20px] text-[rgba(8,8,8,0.4)] shrink-0 transition-transform duration-300"
-                  style={{ transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)' }}
-                >
-                  +
-                </span>
-              </button>
-              {openFaq === i && (
-                <p className="pb-6 text-[14px] text-[rgba(8,8,8,0.6)] leading-relaxed max-w-[600px]">
-                  {faq.a}
-                </p>
-              )}
-            </div>
+        {/* Services accordion */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '0 56px',
+            borderTop: '1px solid #1a1a1a',
+          }}
+        >
+          {SERVICES.map((s, i) => (
+            <ServiceRow
+              key={s.n}
+              s={s}
+              isOpen={openService === i}
+              onToggle={() => toggleService(i)}
+            />
           ))}
         </div>
-      </div>
 
-      {/* CTA */}
-      <div
-        className="px-14 py-24 flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
-        style={{ background: '#C9F135' }}
-      >
-        <h2
-          className="text-[clamp(28px,5vw,64px)] font-black text-[#080808] leading-tight tracking-tight"
-          style={{ fontFamily: 'var(--font-syne)' }}
-        >
-          Start with a free demo.
-        </h2>
-        <button
-          onClick={() => goTo('/contact')}
-          data-cursor="go"
-          className="px-8 py-4 bg-[#080808] text-[#F2EFE8] text-[13px] font-bold tracking-wider uppercase hover:bg-[#1a1a1a] transition-colors duration-200 shrink-0"
-        >
-          Get Started →
-        </button>
+        {/* FAQ */}
+        <div style={{ background: '#F2EFE8', padding: '96px 0', marginTop: 80 }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 56px' }}>
+            <ScrollReveal>
+              <p
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.24em',
+                  color: 'rgba(8,8,8,0.4)',
+                  textTransform: 'uppercase',
+                  marginBottom: 56,
+                }}
+              >
+                Common questions
+              </p>
+            </ScrollReveal>
+
+            {FAQS.map((faq, i) => (
+              <ScrollReveal key={i} delay={i * 0.06}>
+                <motion.div
+                  layout
+                  style={{ borderBottom: '1px solid rgba(8,8,8,0.1)', overflow: 'hidden' }}
+                >
+                  <button
+                    onClick={() => toggleFaq(i)}
+                    style={{
+                      width: '100%',
+                      padding: '22px 0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 16,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-syne)',
+                        fontWeight: 700,
+                        fontSize: 16,
+                        color: '#080808',
+                      }}
+                    >
+                      {faq.q}
+                    </span>
+                    <motion.span
+                      animate={{ rotate: openFaq === i ? 45 : 0 }}
+                      transition={{ duration: 0.3, ease: [0.76, 0, 0.24, 1] }}
+                      style={{
+                        fontSize: 22,
+                        color: '#C9F135',
+                        flexShrink: 0,
+                        display: 'inline-block',
+                        lineHeight: 1,
+                      }}
+                    >
+                      +
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence>
+                    {openFaq === i && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.76, 0, 0.24, 1] }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <p
+                          style={{
+                            paddingBottom: 22,
+                            fontSize: 15,
+                            color: 'rgba(8,8,8,0.6)',
+                            lineHeight: 1.75,
+                            maxWidth: 600,
+                          }}
+                        >
+                          {faq.a}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <section style={{ background: '#C9F135', padding: '96px 56px' }}>
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: '0 auto',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 40,
+            }}
+          >
+            <AnimatedText
+              text="Start with a free demo."
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 800,
+                fontSize: 'clamp(28px,5vw,64px)',
+                color: '#080808',
+                lineHeight: 1.05,
+                letterSpacing: '-0.03em',
+              } as React.CSSProperties}
+            />
+            <ScrollReveal delay={0.2}>
+              <motion.button
+                onClick={() => goTo('/contact')}
+                data-cursor="go"
+                whileHover={{ scale: 1.04, backgroundColor: '#080808', color: '#C9F135' }}
+                whileTap={{ scale: 0.96 }}
+                style={{
+                  padding: '16px 36px',
+                  background: '#080808',
+                  color: '#F2EFE8',
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'background 0.25s, color 0.25s',
+                }}
+              >
+                Get Started →
+              </motion.button>
+            </ScrollReveal>
+          </div>
+        </section>
       </div>
-    </div>
+    </PageTransition>
   );
 }
