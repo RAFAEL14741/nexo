@@ -9,21 +9,11 @@ import {
   animate,
   useMotionValue,
   useSpring,
-  useScroll,
-  useTransform,
 } from 'framer-motion';
 import PageTransition from '@/components/PageTransition';
 import AnimatedText from '@/components/AnimatedText';
 import ScrollReveal from '@/components/ScrollReveal';
 import { usePageTransition } from '@/providers/TransitionProvider';
-import { slideInLeft, staggerContainer } from '@/lib/animations';
-
-const STATS = [
-  { value: 14, label: 'Demos built', fmt: (v: number) => `${v}` },
-  { value: 48, label: 'Avg turnaround', fmt: (v: number) => `${v}h` },
-  { value: 100, label: 'Free to start', fmt: (v: number) => `${v}%` },
-  { value: 0, label: 'Upfront cost', fmt: (v: number) => `$${v}` },
-];
 
 const SERVICES = [
   {
@@ -359,131 +349,6 @@ function ServiceRow({ s, index }: { s: typeof SERVICES[0]; index: number }) {
   );
 }
 
-function WorkCard({
-  item,
-  index,
-  onNavigate,
-}: {
-  item: typeof WORK_ITEMS[0];
-  index: number;
-  onNavigate: (href: string) => void;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '0px 0px -80px 0px' });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 60 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: index * 0.12 }}
-      layoutId={`card-${item.id}`}
-    >
-      <motion.div
-        initial="rest"
-        whileHover="hover"
-        whileTap={{ scale: 0.98 }}
-        variants={{
-          rest: { y: 0, scale: 1 },
-          hover: { y: -8, scale: 1.02, transition: { type: 'spring', damping: 20, stiffness: 200 } },
-        }}
-        style={{
-          position: 'relative',
-          background: item.bg,
-          borderRadius: 2,
-          overflow: 'hidden',
-          aspectRatio: '16/9',
-          cursor: 'pointer',
-        }}
-        onClick={() => onNavigate(`/work/${item.id}`)}
-        data-cursor="view"
-      >
-        {/* Real photo */}
-        {item.img && (
-          <img
-            src={item.img}
-            alt={item.title}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transition: 'transform 0.6s ease',
-            }}
-          />
-        )}
-        {/* Dark scrim */}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,8,8,0.55)' }} />
-        {/* Hover overlay */}
-        <motion.div
-          variants={{
-            rest: { y: '100%' },
-            hover: { y: '0%' },
-          }}
-          transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'rgba(8,8,8,0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-syne)',
-              fontWeight: 800,
-              fontSize: 14,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#F2EFE8',
-            }}
-          >
-            View Case Study{' '}
-            <motion.span
-              variants={{ rest: { x: 0 }, hover: { x: 6 } }}
-              transition={{ duration: 0.25 }}
-              style={{ display: 'inline-block' }}
-            >
-              →
-            </motion.span>
-          </span>
-        </motion.div>
-
-        {/* Tag + title inside card */}
-        <div style={{ position: 'absolute', bottom: 28, left: 28 }}>
-          <span
-            style={{
-              fontSize: 9,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: item.accent,
-              display: 'block',
-              marginBottom: 6,
-            }}
-          >
-            {item.tag}
-          </span>
-          <h3
-            style={{
-              fontFamily: 'var(--font-syne)',
-              fontWeight: 800,
-              fontSize: 'clamp(24px, 3vw, 36px)',
-              color: '#F2EFE8',
-              lineHeight: 1,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            {item.title}
-          </h3>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 export default function HomePage() {
   const router = useRouter();
   const { startTransition } = usePageTransition();
@@ -494,6 +359,7 @@ export default function HomePage() {
     <PageTransition>
       {/* ───── HERO ───── */}
       <section
+        data-s=""
         style={{
           background: '#080808',
           minHeight: '100vh',
@@ -712,9 +578,8 @@ export default function HomePage() {
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
             pointerEvents: 'none',
-            display: 'none',
           }}
-          className="hidden md:block"
+          className="hidden md:flex"
         >
           ⭐ 5.0 · 14 demos built
         </motion.div>
@@ -798,7 +663,7 @@ export default function HomePage() {
       </motion.div>
 
       {/* ───── EDITORIAL STATEMENT ───── */}
-      <section style={{ background: '#F2EFE8', padding: '120px 56px', overflow: 'hidden' }}>
+      <section data-s="" style={{ background: '#F2EFE8', padding: '120px 56px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto' }}>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -856,7 +721,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── STATS ───── */}
-      <section style={{ background: '#080808', padding: '100px 56px' }}>
+      <section data-s="" style={{ background: '#080808', padding: '100px 56px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {[
             { value: 0, label: 'upfront cost', fmt: (v: number) => `$${v}` },
@@ -869,7 +734,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── SERVICES ───── */}
-      <section style={{ background: '#080808', padding: '120px 0' }}>
+      <section data-s="" style={{ background: '#080808', padding: '120px 0' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 56px' }}>
           <ScrollReveal>
             <p
@@ -938,75 +803,105 @@ export default function HomePage() {
       </section>
 
       {/* ───── WORK PREVIEW ───── */}
-      <section style={{ background: '#080808', paddingTop: 80 }}>
+      <section data-s="" style={{ background: '#080808', paddingTop: 80 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 56px', marginBottom: 40 }}>
           <p style={{ fontSize: 10, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(242,239,232,0.3)' }}>
             Selected work
           </p>
         </div>
 
-        {/* Full-width project rows */}
-        {WORK_ITEMS.map((item, i) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6 }}
-            onClick={() => goTo(`/work/${item.id}`)}
-            whileHover="hover"
-            data-cursor="view"
-            style={{
-              position: 'relative',
-              height: '55vh',
-              minHeight: 320,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              borderTop: '1px solid #111',
-              display: 'flex',
-              alignItems: 'flex-end',
-            }}
-          >
-            {/* Background image */}
-            <motion.img
-              src={item.img}
-              alt={item.title}
-              variants={{ rest: { scale: 1 }, hover: { scale: 1.06 } }}
-              initial="rest"
-              transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-            {/* Gradient overlay */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.35) 50%, rgba(8,8,8,0.1) 100%)' }} />
-            {/* Hover tint */}
-            <motion.div
-              variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
-              transition={{ duration: 0.4 }}
-              style={{ position: 'absolute', inset: 0, background: 'rgba(201,241,53,0.04)' }}
-            />
-
-            {/* Content */}
-            <div style={{ position: 'relative', zIndex: 1, width: '100%', padding: '0 56px 48px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-              <div>
-                <span style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: item.accent, display: 'block', marginBottom: 10 }}>
-                  {String(i + 1).padStart(2, '0')} — {item.tag}
-                </span>
-                <h3 style={{ fontFamily: 'var(--font-syne)', fontWeight: 800, fontSize: 'clamp(28px, 4vw, 56px)', color: '#F2EFE8', letterSpacing: '-0.03em', lineHeight: 1 }}>
-                  {item.title}
-                </h3>
-              </div>
+        {/* Bento grid: item 0 full-width tall, 1+2 side by side, 3 full-width */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 2,
+          }}
+        >
+          {WORK_ITEMS.map((item, i) => {
+            const isWide = i === 0 || i === 3;
+            const h = i === 0 ? '65vh' : '44vh';
+            const pad = isWide ? '0 56px 52px' : '0 36px 36px';
+            const titleSize = isWide
+              ? 'clamp(32px, 5vw, 64px)'
+              : 'clamp(20px, 2.8vw, 40px)';
+            return (
               <motion.div
-                variants={{ rest: { x: 0, opacity: 0.35 }, hover: { x: 12, opacity: 1 } }}
-                transition={{ duration: 0.3 }}
-                style={{ fontFamily: 'var(--font-syne)', fontWeight: 800, fontSize: 28, color: '#F2EFE8', flexShrink: 0 }}
+                key={item.id}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.6, delay: isWide ? 0 : (i % 2) * 0.08 }}
+                onClick={() => goTo(`/work/${item.id}`)}
+                whileHover="hover"
+                data-cursor="view"
+                style={{
+                  position: 'relative',
+                  height: h,
+                  minHeight: 260,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  gridColumn: isWide ? '1 / -1' : 'auto',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                }}
               >
-                →
-              </motion.div>
-            </div>
-          </motion.div>
-        ))}
+                {/* Background image */}
+                <motion.img
+                  src={item.img}
+                  alt={item.title}
+                  variants={{ rest: { scale: 1 }, hover: { scale: 1.06 } }}
+                  initial="rest"
+                  transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                {/* Gradient */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,8,8,0.93) 0%, rgba(8,8,8,0.3) 55%, rgba(8,8,8,0.05) 100%)' }} />
+                {/* Hover lime tint */}
+                <motion.div
+                  variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
+                  transition={{ duration: 0.4 }}
+                  style={{ position: 'absolute', inset: 0, background: 'rgba(201,241,53,0.04)' }}
+                />
+                {/* Hover left border */}
+                <motion.div
+                  variants={{ rest: { scaleY: 0 }, hover: { scaleY: 1 } }}
+                  transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                    background: '#C9F135',
+                    transformOrigin: 'bottom center',
+                  }}
+                />
 
-        <div style={{ padding: '40px 56px', borderTop: '1px solid #111', display: 'flex', justifyContent: 'flex-end' }}>
+                {/* Content */}
+                <div style={{ position: 'relative', zIndex: 1, width: '100%', padding: pad, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                  <div>
+                    <span style={{ fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: item.accent, display: 'block', marginBottom: 10 }}>
+                      {String(i + 1).padStart(2, '0')} — {item.tag}
+                    </span>
+                    <h3 style={{ fontFamily: 'var(--font-syne)', fontWeight: 800, fontSize: titleSize, color: '#F2EFE8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                      {item.title}
+                    </h3>
+                  </div>
+                  <motion.div
+                    variants={{ rest: { x: 0, opacity: 0.3 }, hover: { x: 10, opacity: 1, color: '#C9F135' } }}
+                    transition={{ duration: 0.3 }}
+                    style={{ fontFamily: 'var(--font-syne)', fontWeight: 800, fontSize: isWide ? 30 : 22, color: '#F2EFE8', flexShrink: 0 }}
+                  >
+                    →
+                  </motion.div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div style={{ padding: '36px 56px', borderTop: '1px solid #111', display: 'flex', justifyContent: 'flex-end' }}>
           <MagneticButton
             onClick={() => goTo('/work')}
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(242,239,232,0.4)', display: 'inline-flex', alignItems: 'center', gap: 8, padding: 0 }}
@@ -1017,7 +912,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── PROCESS ───── */}
-      <section style={{ background: '#F2EFE8', padding: '120px 56px' }}>
+      <section data-s="" style={{ background: '#F2EFE8', padding: '120px 56px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -1093,7 +988,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── TESTIMONIALS ───── */}
-      <section style={{ background: '#080808', padding: '120px 56px' }}>
+      <section data-s="" style={{ background: '#080808', padding: '120px 56px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <ScrollReveal>
             <p
@@ -1109,50 +1004,83 @@ export default function HomePage() {
             </p>
           </ScrollReveal>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: 20,
-            }}
-          >
+          {/* Editorial rows — consistent with services accordion style */}
+          <div style={{ borderTop: '1px solid #1a1a1a' }}>
             {TESTIMONIALS.map((t, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: i * 0.12 }}
-                whileHover={{ y: -4, borderColor: '#2a2a2a' }}
+                transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: i * 0.1 }}
                 style={{
-                  border: '1px solid #1a1a1a',
-                  padding: '32px',
-                  cursor: 'default',
-                  transition: 'border-color 0.3s',
+                  borderBottom: '1px solid #1a1a1a',
+                  padding: '52px 0',
+                  display: 'grid',
+                  gridTemplateColumns: '40px 1fr auto',
+                  gap: '40px',
+                  alignItems: 'start',
                 }}
               >
-                <p
+                {/* Index */}
+                <span
                   style={{
-                    fontSize: 15,
-                    color: 'rgba(242,239,232,0.7)',
-                    lineHeight: 1.7,
-                    marginBottom: 24,
+                    fontFamily: 'var(--font-syne)',
+                    fontWeight: 800,
+                    fontSize: 11,
+                    color: 'rgba(242,239,232,0.18)',
+                    letterSpacing: '0.1em',
+                    paddingTop: 5,
                   }}
                 >
-                  "{t.text}"
-                </p>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+
+                {/* Quote + lime accent line */}
                 <div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-syne)',
+                      fontWeight: 700,
+                      fontSize: 'clamp(17px, 2.2vw, 26px)',
+                      color: '#F2EFE8',
+                      lineHeight: 1.4,
+                      letterSpacing: '-0.02em',
+                      marginBottom: 28,
+                    }}
+                  >
+                    &ldquo;{t.text}&rdquo;
+                  </p>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: 36 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1], delay: i * 0.1 + 0.35 }}
+                    style={{ height: 2, background: '#C9F135' }}
+                  />
+                </div>
+
+                {/* Attribution — right-aligned */}
+                <div style={{ textAlign: 'right', paddingTop: 5 }}>
                   <p
                     style={{
                       fontFamily: 'var(--font-syne)',
                       fontWeight: 700,
                       fontSize: 13,
                       color: '#F2EFE8',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {t.name}
                   </p>
-                  <p style={{ fontSize: 11, color: 'rgba(242,239,232,0.3)', marginTop: 2 }}>
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(242,239,232,0.28)',
+                      marginTop: 5,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     {t.biz}
                   </p>
                 </div>
@@ -1163,7 +1091,7 @@ export default function HomePage() {
       </section>
 
       {/* ───── CTA BANNER ───── */}
-      <section style={{ background: '#C9F135', padding: '100px 56px' }}>
+      <section data-s="" style={{ background: '#C9F135', padding: '100px 56px' }}>
         <div
           style={{
             maxWidth: 1200,

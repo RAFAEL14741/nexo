@@ -7,6 +7,8 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import Cursor from '@/components/Cursor';
 import Ripple from '@/components/Ripple';
+import Loader from '@/components/Loader';
+import SectionCounter from '@/components/SectionCounter';
 
 const syne = Syne({
   subsets: ['latin'],
@@ -49,6 +51,8 @@ export default function RootLayout({
         <LenisProvider>
           <TransitionProvider>
             {/* Global persistent UI */}
+            <Loader />
+            <SectionCounter />
             <Cursor />
             <Ripple />
             <Nav />

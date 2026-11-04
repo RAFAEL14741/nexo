@@ -217,7 +217,7 @@ body::after {
 .mq-track {
   display: flex;
   width: max-content;
-  animation: mq-roll 50s linear infinite;
+  animation: mq-roll 30s linear infinite;
 }
 
 .mq-wrap:hover .mq-track {
