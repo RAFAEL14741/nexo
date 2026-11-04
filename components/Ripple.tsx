@@ -1,41 +1,54 @@
 'use client';
 
-import { useEffect } from 'react';
-import gsap from 'gsap';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface RippleItem {
+  id: number;
+  x: number;
+  y: number;
+}
 
 export default function Ripple() {
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const r = document.createElement('div');
-      r.style.cssText = `
-        position:fixed;
-        pointer-events:none;
-        z-index:99988;
-        width:40px;
-        height:40px;
-        border-radius:50%;
-        border:1px solid rgba(255,255,255,0.3);
-        left:${e.clientX - 20}px;
-        top:${e.clientY - 20}px;
-        will-change:transform,opacity;
-      `;
-      document.body.appendChild(r);
-      gsap.fromTo(
-        r,
-        { scale: 0, opacity: 1 },
-        {
-          scale: 4,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power2.out',
-          onComplete: () => r.remove(),
-        }
-      );
-    };
+  const [ripples, setRipples] = useState<RippleItem[]>([]);
 
-    window.addEventListener('click', handleClick);
-    return () => window.removeEventListener('click', handleClick);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const id = Date.now() + Math.random();
+      setRipples(prev => [...prev, { id, x: e.clientX, y: e.clientY }]);
+    };
+    window.addEventListener('click', handler);
+    return () => window.removeEventListener('click', handler);
   }, []);
 
-  return null;
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-[99988]"
+      aria-hidden="true"
+    >
+      <AnimatePresence>
+        {ripples.map(r => (
+          <motion.div
+            key={r.id}
+            initial={{ scale: 0, opacity: 0.5 }}
+            animate={{ scale: 4, opacity: 0 }}
+            exit={{}}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            onAnimationComplete={() =>
+              setRipples(prev => prev.filter(rp => rp.id !== r.id))
+            }
+            style={{
+              position: 'absolute',
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              border: '1px solid rgba(255,255,255,0.25)',
+              left: r.x - 20,
+              top: r.y - 20,
+            }}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
 }

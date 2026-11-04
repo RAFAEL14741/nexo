@@ -1,152 +1,211 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { useEffect, useState } from 'react';
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  type Variants,
+} from 'framer-motion';
 
 type CursorMode = 'default' | 'hover' | 'view' | 'go';
 
+const EASE = [0.76, 0, 0.24, 1] as const;
+
+const cursorVariants: Variants = {
+  default: {
+    scale: 1,
+    opacity: 1,
+    backgroundColor: 'rgba(255,255,255,0)',
+    borderColor: 'rgba(255,255,255,1)',
+  },
+  hover: {
+    scale: 2.5,
+    opacity: 1,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderColor: 'rgba(255,255,255,0.9)',
+  },
+  view: {
+    scale: 80 / 32,
+    opacity: 1,
+    backgroundColor: 'rgba(10,10,10,0.92)',
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  go: {
+    scale: 60 / 32,
+    opacity: 1,
+    backgroundColor: 'rgba(10,10,10,0.92)',
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+};
+
+const cursorTransition = {
+  type: 'spring' as const,
+  damping: 20,
+  stiffness: 380,
+  mass: 0.55,
+};
+
+const labelVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.6, y: 4, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { type: 'spring', damping: 16, stiffness: 480, mass: 0.4 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.75,
+    y: -3,
+    filter: 'blur(3px)',
+    transition: { duration: 0.12, ease: EASE },
+  },
+};
+
 export default function Cursor() {
-  const curRef   = useRef<HTMLDivElement>(null);
-  const txtRef   = useRef<HTMLSpanElement>(null);
-  const txRef    = useRef(-100);
-  const tyRef    = useRef(-100);
-  const cxRef    = useRef(-100);
-  const cyRef    = useRef(-100);
   const [mode, setMode] = useState<CursorMode>('default');
-  const modeRef  = useRef<CursorMode>('default');
-  const [text, setText] = useState('');
+  const [label, setLabel] = useState('');
+  const [mounted, setMounted] = useState(false);
+  const [clicking, setClicking] = useState(false);
+
+  const rawX = useMotionValue(-100);
+  const rawY = useMotionValue(-100);
+  const trailX = useMotionValue(-100);
+  const trailY = useMotionValue(-100);
+
+  const x = useSpring(rawX, { damping: 28, stiffness: 520, mass: 0.35 });
+  const y = useSpring(rawY, { damping: 28, stiffness: 520, mass: 0.35 });
+  const lagX = useSpring(trailX, { damping: 16, stiffness: 100, mass: 0.9 });
+  const lagY = useSpring(trailY, { damping: 16, stiffness: 100, mass: 0.9 });
 
   useEffect(() => {
-    const cur  = curRef.current;
-    const txt  = txtRef.current;
-    if (!cur || !txt) return;
+    setMounted(true);
 
-    /* Smooth following via GSAP ticker */
-    const tick = () => {
-      cxRef.current += (txRef.current - cxRef.current) * 0.12;
-      cyRef.current += (tyRef.current - cyRef.current) * 0.12;
-      gsap.set(cur, { x: cxRef.current - 16, y: cyRef.current - 16 });
+    let current: CursorMode = 'default';
+
+    const set = (m: CursorMode, lbl = '') => {
+      if (current === m) return;
+      current = m;
+      setMode(m);
+      setLabel(lbl);
     };
-    gsap.ticker.add(tick);
 
     const onMove = (e: MouseEvent) => {
-      txRef.current = e.clientX;
-      tyRef.current = e.clientY;
+      rawX.set(e.clientX - 16);
+      rawY.set(e.clientY - 16);
+      trailX.set(e.clientX - 24);
+      trailY.set(e.clientY - 24);
     };
-    window.addEventListener('mousemove', onMove);
 
-    /* Cursor state helpers */
-    const setCursorMode = (m: CursorMode, label = '') => {
-      if (modeRef.current === m) return;
-      modeRef.current = m;
-      setMode(m);
-      setText(label);
-
-      gsap.killTweensOf(cur);
-      gsap.killTweensOf(txt);
-
-      switch (m) {
-        case 'view':
-          gsap.to(cur, { scale: 3,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 1, duration: 0.15 });
-          break;
-        case 'go':
-          gsap.to(cur, { scale: 2,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 1, duration: 0.15 });
-          break;
-        case 'hover':
-          gsap.to(cur, { scale: 2.5, duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 0, duration: 0.1 });
-          break;
-        default:
-          gsap.to(cur, { scale: 1,   duration: 0.3, ease: 'power2.out' });
-          gsap.to(txt, { opacity: 0, duration: 0.1 });
+    const onOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const cursorEl = target?.closest<HTMLElement>('[data-cursor]');
+      if (cursorEl) {
+        const c = cursorEl.getAttribute('data-cursor');
+        if (c === 'view') return set('view', 'VIEW');
+        if (c === 'go') return set('go', 'GO');
       }
-    };
-    const resetCursor = () => setCursorMode('default');
-
-    /* Wire up hover targets */
-    const wireHover = (sel: string, m: CursorMode, label = '') => {
-      document.querySelectorAll<HTMLElement>(sel).forEach(el => {
-        el.addEventListener('mouseenter', () => setCursorMode(m, label));
-        el.addEventListener('mouseleave', resetCursor);
-      });
+      if (target?.closest('a, button, input, select, textarea')) {
+        return set('hover');
+      }
+      set('default');
     };
 
-    /* Use MutationObserver so dynamically added elements get wired too */
-    const wire = () => {
-      wireHover('a:not([data-cursor-wired])', 'hover');
-      wireHover('button:not([data-cursor-wired])', 'hover');
-      wireHover('input, select, textarea', 'hover');
-      wireHover('[data-cursor="view"]', 'view', 'VIEW');
-      wireHover('[data-cursor="go"]', 'go', 'GO');
-      /* Mark elements as wired */
-      document.querySelectorAll('a, button').forEach(el =>
-        el.setAttribute('data-cursor-wired', '1')
-      );
-    };
+    const onDown = () => setClicking(true);
+    const onUp = () => setClicking(false);
 
-    wire();
-
-    const observer = new MutationObserver(wire);
-    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseover', onOver);
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('mouseup', onUp);
 
     return () => {
-      gsap.ticker.remove(tick);
       window.removeEventListener('mousemove', onMove);
-      observer.disconnect();
+      document.removeEventListener('mouseover', onOver);
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mouseup', onUp);
     };
-  }, []);
+  }, [rawX, rawY, trailX, trailY]);
 
-  /* Visible only on desktop (hidden via CSS on mobile) */
+  if (!mounted) return null;
+
+  const isLabeled = mode === 'view' || mode === 'go';
+  const blendMode: React.CSSProperties['mixBlendMode'] = isLabeled ? 'normal' : 'difference';
+
   return (
-    <div
-      ref={curRef}
-      aria-hidden="true"
-      className="fixed top-0 left-0 z-[99999] pointer-events-none hidden md:block"
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: '50%',
-        border: '1.5px solid white',
-        background:
-          mode === 'hover' || mode === 'view' || mode === 'go'
-            ? mode === 'hover'
-              ? 'white'
-              : 'rgba(12,12,12,0.92)'
-            : 'transparent',
-        borderColor:
-          mode === 'view' || mode === 'go'
-            ? 'rgba(255,255,255,0.12)'
-            : 'white',
-        mixBlendMode: mode === 'view' || mode === 'go' ? 'normal' : 'difference',
-        willChange: 'transform',
-        transition: 'background 0.15s, border-color 0.15s, mix-blend-mode 0s',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <span
-        ref={txtRef}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: 'var(--font-syne)',
-          fontSize: 8,
-          fontWeight: 800,
-          letterSpacing: '0.06em',
-          color: 'white',
-          opacity: 0,
-          userSelect: 'none',
-          pointerEvents: 'none',
+    <>
+      {/* Trailing ring — slower spring for lag behind the pointer */}
+      <motion.div
+        aria-hidden="true"
+        className="fixed top-0 left-0 z-[99998] pointer-events-none hidden md:block"
+        style={{ x: lagX, y: lagY, mixBlendMode: blendMode }}
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{
+          opacity: mode === 'default' ? 0.4 : 0,
+          scale: mode === 'hover' ? 1.6 : 1,
         }}
+        transition={{ type: 'spring', damping: 22, stiffness: 260 }}
       >
-        {text}
-      </span>
-    </div>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        />
+      </motion.div>
+
+      {/* Main cursor */}
+      <motion.div
+        aria-hidden="true"
+        className="fixed top-0 left-0 z-[99999] pointer-events-none hidden md:flex items-center justify-center"
+        style={{
+          x,
+          y,
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          border: '1.5px solid',
+          mixBlendMode: blendMode,
+        }}
+        variants={cursorVariants}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={mode}
+        transition={cursorTransition}
+      >
+        <motion.div
+          animate={{ scale: clicking ? 0.88 : 1 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 600, mass: 0.3 }}
+          className="flex items-center justify-center w-full h-full"
+        >
+          <AnimatePresence mode="wait">
+            {label && (
+              <motion.span
+                key={label}
+                variants={labelVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                style={{
+                  fontFamily: 'var(--font-syne)',
+                  fontSize: 7,
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  color: 'white',
+                  userSelect: 'none',
+                  lineHeight: 1,
+                }}
+              >
+                {label}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
+    </>
   );
 }

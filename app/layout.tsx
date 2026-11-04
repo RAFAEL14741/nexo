@@ -4,7 +4,6 @@ import './globals.css';
 import { TransitionProvider } from '@/providers/TransitionProvider';
 import LenisProvider from '@/providers/LenisProvider';
 import Nav from '@/components/Nav';
-import Footer from '@/components/Footer';
 import Cursor from '@/components/Cursor';
 import Ripple from '@/components/Ripple';
 
@@ -55,8 +54,6 @@ export default function RootLayout({
 
             {/* Page content — template.tsx wraps each page */}
             <main>{children}</main>
-
-            <Footer />
           </TransitionProvider>
         </LenisProvider>
       </body>
